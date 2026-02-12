@@ -69,15 +69,15 @@ services:
     build:
       context: ./frontend-admin
       dockerfile: Dockerfile
+      args:
+        VITE_RAILS_API_URL: ""
+        VITE_GO_SUBMISSIONS_URL: ""
     container_name: formflow-frontend
     ports:
-      - "5173:5173"
-    environment:
-      VITE_RAILS_API_URL: "http://localhost:3000"
-      VITE_GO_SUBMISSIONS_URL: "http://localhost:8080"
-    volumes:
-      - ./frontend-admin:/app
-      - /app/node_modules
+      - "5173:80"
+    depends_on:
+      - rails-api
+      - go-submissions
     networks:
       - formflow
 

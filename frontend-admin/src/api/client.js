@@ -1,5 +1,5 @@
-const RAILS_API = import.meta.env.VITE_RAILS_API_URL || "http://localhost:3000";
-const GO_API = import.meta.env.VITE_GO_SUBMISSIONS_URL || "http://localhost:8080";
+const RAILS_API = import.meta.env.VITE_RAILS_API_URL ?? "http://localhost:3000";
+const GO_API = import.meta.env.VITE_GO_SUBMISSIONS_URL ?? "http://localhost:8080";
 
 async function request(url, options = {}) {
   const headers = { ...options.headers };
