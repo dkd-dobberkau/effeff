@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What is FormFlow?
 
-FormFlow is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions. Four services plus a database, orchestrated via Docker Compose.
+FormFlow is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads. Five services orchestrated via Docker Compose.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ Three application services share one SurrealDB instance, with Garage for file st
 - **Go Submissions** (`go-submissions/`, port 8080) – Receives and validates form submissions at high throughput. Handles file uploads to S3. This is the only service that writes submissions.
 - **React Frontend** (`frontend-admin/`, port 5173) – Admin dashboard and public form renderer. Vite + React 18 + Tailwind CSS. Uses dnd-kit for drag-and-drop question reordering.
 - **SurrealDB** (port 8000) – Document-style NoSQL database. Schema defined in `docker/schema.surql`.
-- **Garage** (port 3900 S3 API, port 3903 admin) – S3-compatible object storage for file uploads. Config in `docker/garage.toml`.
+- **Garage** (port 3900 S3 API, port 3903 admin) – S3-compatible object storage for file uploads. Config in `docker/garage.toml`. Admin API uses v2 endpoints (`/v2/GetClusterHealth`, `/v2/CreateBucket`, etc.). The Docker image is minimal (no shell, no curl) — healthcheck uses `/garage stats`.
 
 The split rationale: Rails handles the comfortable CRUD/admin work, Go handles the hot path (submissions + file uploads) where throughput matters.
 
@@ -32,8 +32,10 @@ docker compose exec surrealdb /bin/sh -c \
     --data-binary @/docker/schema.surql"
 
 # Init Garage S3 (required on first run, after garage is healthy):
-docker compose exec garage /bin/sh /docker/garage-init.sh
-# Copy the printed S3_ACCESS_KEY and S3_SECRET_KEY into docker-compose.yml
+# Run from host — Garage image is minimal (no shell, no curl):
+GARAGE_ADMIN=http://localhost:3903 sh docker/garage-init.sh
+# Copy the printed S3_ACCESS_KEY and S3_SECRET_KEY into docker-compose.yml,
+# then: docker compose restart go-submissions
 ```
 
 ### Individual services (local dev)
@@ -130,7 +132,7 @@ Submission flow:
 6. On success, `store.CreateSubmission` writes to SurrealDB
 7. `store.IncrementFormStats` runs async in a goroutine
 
-Dependencies: chi (router), cors, httprate (rate limiting at 60/min per IP), minio-go (S3 client), uuid. No ORM.
+Dependencies: chi (router), cors, httprate (rate limiting at 60/min per IP), minio-go (S3 client), uuid. No ORM. Go 1.24, built via `golang:1.24-alpine` in Dockerfile.
 
 Input sanitization via `store/sanitize.go`: validates slugs and record IDs before query construction, escapes strings for SurrealQL.
 
@@ -184,6 +186,13 @@ Current valid types: `welcome`, `thank_you`, `text`, `email`, `long_text`, `mult
 - Frontend: functional React, hooks, no class components, API calls via the centralized client
 - All services log to stdout for Docker
 - German language in user-facing form content and UI labels, English in code and API responses
+
+## Documentation
+
+- `README.md` — Project overview, features, screenshots, quick start, API examples
+- `docs/SETUP.md` — Full setup guide: Docker, local dev, Garage init, env vars, troubleshooting
+- `docs/ARCHITECTURE.md` — API reference, data model, auth, file uploads, question types
+- `docs/screenshots/` — 15 UI screenshots (admin dashboard + public form renderer)
 
 ## Known limitations
 
