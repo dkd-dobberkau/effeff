@@ -19,12 +19,14 @@ class Question
   # ─── Finders ─────────────────────────────────────────────
 
   def self.find(id)
+    SurrealSanitizer.validate_record_id!(id)
     record = SURREAL.query_one("SELECT * FROM #{id};")
     raise SurrealClient::NotFoundError, "Question #{id} not found" unless record
     from_surreal(record)
   end
 
   def self.for_form(form_id)
+    SurrealSanitizer.validate_record_id!(form_id)
     records = SURREAL.query_first(
       "SELECT * FROM question WHERE form_id = #{form_id} ORDER BY position ASC;"
     )
@@ -38,15 +40,16 @@ class Question
   end
 
   def create
+    SurrealSanitizer.validate_record_id!(form_id)
     raise ArgumentError, "Invalid type: #{type}" unless VALID_TYPES.include?(type)
 
     sql = <<~SURQL
       CREATE question SET
         form_id = #{form_id},
         type = '#{type}',
-        title = '#{escape(title)}',
-        subtitle = '#{escape(subtitle)}',
-        placeholder = '#{escape(placeholder)}',
+        title = '#{SurrealSanitizer.escape_string(title)}',
+        subtitle = '#{SurrealSanitizer.escape_string(subtitle)}',
+        placeholder = '#{SurrealSanitizer.escape_string(placeholder)}',
         position = #{position || next_position},
         required = #{required || false},
         options = #{(options || []).to_json},
@@ -61,12 +64,13 @@ class Question
   end
 
   def update
+    SurrealSanitizer.validate_record_id!(id)
     sql = <<~SURQL
       UPDATE #{id} SET
         type = '#{type}',
-        title = '#{escape(title)}',
-        subtitle = '#{escape(subtitle)}',
-        placeholder = '#{escape(placeholder)}',
+        title = '#{SurrealSanitizer.escape_string(title)}',
+        subtitle = '#{SurrealSanitizer.escape_string(subtitle)}',
+        placeholder = '#{SurrealSanitizer.escape_string(placeholder)}',
         position = #{position},
         required = #{required},
         options = #{options.to_json},
@@ -79,6 +83,7 @@ class Question
   end
 
   def destroy
+    SurrealSanitizer.validate_record_id!(id)
     SURREAL.query("DELETE #{id};")
     true
   end
@@ -86,7 +91,9 @@ class Question
   # ─── Reordering ─────────────────────────────────────────
 
   def self.reorder(form_id, question_ids)
+    SurrealSanitizer.validate_record_id!(form_id)
     question_ids.each_with_index do |qid, index|
+      SurrealSanitizer.validate_record_id!(qid)
       SURREAL.query("UPDATE #{qid} SET position = #{index};")
     end
   end
@@ -132,13 +139,10 @@ class Question
   private
 
   def next_position
+    SurrealSanitizer.validate_record_id!(form_id)
     result = SURREAL.query_one(
       "SELECT math::max(position) AS max_pos FROM question WHERE form_id = #{form_id} GROUP ALL;"
     )
     (result&.dig("max_pos") || -1) + 1
-  end
-
-  def escape(str)
-    str.to_s.gsub("'", "\\'")
   end
 end

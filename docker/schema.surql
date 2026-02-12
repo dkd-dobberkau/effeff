@@ -87,6 +87,18 @@ DEFINE FIELD updated_at        ON form_stats TYPE datetime DEFAULT time::now();
 
 DEFINE INDEX idx_stats_form ON form_stats COLUMNS form_id UNIQUE;
 
+-- ─── Admin Users ─────────────────────────────────────────────
+
+DEFINE TABLE admin_user SCHEMAFULL;
+
+DEFINE FIELD email         ON admin_user TYPE string ASSERT $value != NONE;
+DEFINE FIELD password_hash ON admin_user TYPE string ASSERT $value != NONE;
+DEFINE FIELD name          ON admin_user TYPE option<string>;
+DEFINE FIELD created_at    ON admin_user TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at    ON admin_user TYPE datetime DEFAULT time::now();
+
+DEFINE INDEX idx_admin_user_email ON admin_user COLUMNS email UNIQUE;
+
 -- ─── Sample Data ───────────────────────────────────────────
 
 -- Create a demo form

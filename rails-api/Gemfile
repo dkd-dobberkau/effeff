@@ -7,6 +7,8 @@ gem "puma", ">= 5.0"
 gem "surrealdb", "~> 0.2"  # SurrealDB Ruby client
 gem "httparty"              # HTTP client for SurrealDB REST API
 gem "rack-cors"             # CORS support
+gem "bcrypt", "~> 3.1"      # Password hashing
+gem "jwt", "~> 2.8"         # JSON Web Tokens
 gem "jbuilder"              # JSON views
 gem "bootsnap", require: false
 
@@ -17,4 +19,5 @@ end
 group :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
+  gem "webmock"
 end

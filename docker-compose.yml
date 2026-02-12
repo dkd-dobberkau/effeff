@@ -17,6 +17,25 @@ services:
     networks:
       - formflow
 
+  # ─── Garage (S3-compatible object storage) ─────────────
+  garage:
+    image: dxflrs/garage:v2.2.0
+    container_name: formflow-garage
+    ports:
+      - "3900:3900"
+      - "3903:3903"
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3903/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - formflow
+
   # ─── Rails API ───────────────────────────────────────────
   rails-api:
     build:
@@ -34,6 +53,9 @@ services:
       SURREAL_DB: main
       RAILS_ENV: development
       GO_SUBMISSIONS_URL: "http://go-submissions:8080"
+      JWT_SECRET: "formflow_dev_jwt_secret_change_in_production"
+      S3_ENDPOINT: "http://garage:3900"
+      S3_BUCKET: "formflow-uploads"
     depends_on:
       surrealdb:
         condition: service_healthy
@@ -58,6 +80,11 @@ services:
       SURREAL_DB: main
       PORT: "8080"
       RAILS_API_URL: "http://rails-api:3000"
+      S3_ENDPOINT: "garage:3900"
+      S3_ACCESS_KEY: ""
+      S3_SECRET_KEY: ""
+      S3_BUCKET: "formflow-uploads"
+      S3_USE_SSL: "false"
     depends_on:
       surrealdb:
         condition: service_healthy
@@ -83,6 +110,8 @@ services:
 
 volumes:
   surreal_data:
+  garage_meta:
+  garage_data:
 
 networks:
   formflow:

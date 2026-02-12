@@ -13,6 +13,9 @@ class Submission
   # ─── Finders ─────────────────────────────────────────────
 
   def self.for_form(form_id, limit: 50, offset: 0)
+    SurrealSanitizer.validate_record_id!(form_id)
+    limit = SurrealSanitizer.validate_integer!(limit)
+    offset = SurrealSanitizer.validate_integer!(offset)
     records = SURREAL.query_first(
       "SELECT * FROM submission WHERE form_id = #{form_id} ORDER BY completed_at DESC LIMIT #{limit} START #{offset};"
     )
@@ -20,12 +23,14 @@ class Submission
   end
 
   def self.find(id)
+    SurrealSanitizer.validate_record_id!(id)
     record = SURREAL.query_one("SELECT * FROM #{id};")
     raise SurrealClient::NotFoundError, "Submission #{id} not found" unless record
     from_surreal(record)
   end
 
   def self.count_for_form(form_id)
+    SurrealSanitizer.validate_record_id!(form_id)
     result = SURREAL.query_one(
       "SELECT count() FROM submission WHERE form_id = #{form_id} GROUP ALL;"
     )
@@ -35,6 +40,7 @@ class Submission
   # ─── Analytics ───────────────────────────────────────────
 
   def self.analytics(form_id)
+    SurrealSanitizer.validate_record_id!(form_id)
     total = count_for_form(form_id)
 
     avg_result = SURREAL.query_one(

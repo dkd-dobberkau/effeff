@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/httprate"
 
 	"github.com/formflow/go-submissions/internal/handlers"
+	"github.com/formflow/go-submissions/internal/storage"
 	"github.com/formflow/go-submissions/internal/store"
 )
 
@@ -23,17 +24,37 @@ func main() {
 	db := store.New()
 
 	// Wait for SurrealDB
-	log.Println("⏳ Waiting for SurrealDB...")
+	log.Println("Waiting for SurrealDB...")
 	for i := 0; i < 30; i++ {
 		if err := db.Health(); err == nil {
-			log.Println("✅ SurrealDB connected")
+			log.Println("SurrealDB connected")
 			break
 		}
 		time.Sleep(time.Second)
 	}
 
+	// Init S3 storage (optional — if credentials are set)
+	var fileStorage storage.Storage
+	s3Endpoint := getEnv("S3_ENDPOINT", "")
+	s3AccessKey := getEnv("S3_ACCESS_KEY", "")
+	s3SecretKey := getEnv("S3_SECRET_KEY", "")
+	s3Bucket := getEnv("S3_BUCKET", "formflow-uploads")
+	s3UseSSL := getEnv("S3_USE_SSL", "false") == "true"
+
+	if s3Endpoint != "" && s3AccessKey != "" && s3SecretKey != "" {
+		s3, err := storage.NewS3Storage(s3Endpoint, s3AccessKey, s3SecretKey, s3Bucket, s3UseSSL)
+		if err != nil {
+			log.Printf("WARN: S3 storage init failed: %v (file uploads disabled)", err)
+		} else {
+			fileStorage = s3
+			log.Printf("S3 storage connected (%s/%s)", s3Endpoint, s3Bucket)
+		}
+	} else {
+		log.Println("S3 not configured — file uploads disabled")
+	}
+
 	// Init handlers
-	h := handlers.New(db)
+	h := handlers.New(db, fileStorage)
 
 	// Router
 	r := chi.NewRouter()
@@ -67,7 +88,7 @@ func main() {
 	port := getEnv("PORT", "8080")
 	addr := fmt.Sprintf(":%s", port)
 
-	log.Printf("🚀 FormFlow Submissions Service starting on %s", addr)
+	log.Printf("FormFlow Submissions Service starting on %s", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}

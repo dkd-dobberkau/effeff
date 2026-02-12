@@ -3,15 +3,53 @@ const GO_API = import.meta.env.VITE_GO_SUBMISSIONS_URL ?? "http://localhost:8080
 
 async function request(url, options = {}) {
   const headers = { ...options.headers };
-  if (options.body) headers["Content-Type"] = "application/json";
+
+  // Attach auth token for Rails API calls
+  if (url.startsWith(RAILS_API)) {
+    const token = localStorage.getItem("formflow_token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Set Content-Type for JSON body (skip for FormData)
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const res = await fetch(url, { ...options, headers });
+
+  // On 401 from Rails API, clear token and redirect to login
+  if (res.status === 401 && url.startsWith(RAILS_API) && !url.includes("/auth/")) {
+    localStorage.removeItem("formflow_token");
+    window.location.href = "/login";
+    throw new Error("Session expired");
+  }
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(error.error || "Request failed");
   }
   return res.json();
 }
+
+// ─── Auth ───────────────────────────────────────────────────
+
+export const auth = {
+  login: (email, password) =>
+    request(`${RAILS_API}/api/v1/auth/login`, {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+
+  register: (email, password, name) =>
+    request(`${RAILS_API}/api/v1/auth/register`, {
+      method: "POST",
+      body: JSON.stringify({ email, password, name }),
+    }),
+
+  me: () => request(`${RAILS_API}/api/v1/auth/me`),
+
+  status: () => request(`${RAILS_API}/api/v1/auth/status`),
+};
 
 // ─── Forms ─────────────────────────────────────────────────
 
@@ -98,6 +136,12 @@ export const submissions = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  submitWithFiles: (formSlug, formData) =>
+    request(`${GO_API}/submit/${formSlug}`, {
+      method: "POST",
+      body: formData,
+    }),
 };
 
-export default { forms, questions, submissions };
+export default { auth, forms, questions, submissions };

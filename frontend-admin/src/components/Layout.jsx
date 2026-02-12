@@ -1,7 +1,16 @@
-import { Outlet, NavLink } from "react-router-dom";
-import { LayoutDashboard } from "lucide-react";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { LayoutDashboard, LogOut } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Layout() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -28,7 +37,20 @@ export default function Layout() {
             Formulare
           </NavLink>
         </nav>
-        <div className="mt-auto pt-4 text-xs text-gray-600">FormFlow v1.0</div>
+        <div className="mt-auto border-t border-gray-800 pt-4">
+          {user && (
+            <div className="mb-2 truncate px-2 text-xs text-gray-500">
+              {user.email}
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-800/60 hover:text-gray-200"
+          >
+            <LogOut size={16} />
+            Abmelden
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}

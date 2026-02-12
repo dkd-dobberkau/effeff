@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -102,6 +103,31 @@ func ValidateSubmission(form *models.Form, req *models.SubmissionRequest) map[st
 					if ml, ok := maxLen.(float64); ok && len(str) > int(ml) {
 						errors[q.ID] = fmt.Sprintf("Maximal %d Zeichen erlaubt", int(ml))
 					}
+				}
+			}
+
+		case "file_upload":
+			if str, ok := val.(string); ok && str != "" {
+				ext := strings.ToLower(filepath.Ext(str))
+				allowed := map[string]bool{
+					".pdf": true, ".doc": true, ".docx": true,
+					".png": true, ".jpg": true, ".jpeg": true, ".gif": true, ".webp": true,
+					".csv": true, ".xlsx": true, ".xls": true,
+					".txt": true, ".zip": true,
+				}
+				// Check custom allowed extensions from settings
+				if customExts, ok := q.Settings["allowed_extensions"]; ok {
+					if arr, ok := customExts.([]interface{}); ok {
+						allowed = make(map[string]bool)
+						for _, e := range arr {
+							if s, ok := e.(string); ok {
+								allowed[strings.ToLower(s)] = true
+							}
+						}
+					}
+				}
+				if !allowed[ext] {
+					errors[q.ID] = fmt.Sprintf("Dateityp %s ist nicht erlaubt", ext)
 				}
 			}
 		}

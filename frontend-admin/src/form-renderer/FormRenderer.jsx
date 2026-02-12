@@ -12,6 +12,7 @@ import LongText from "./questions/LongText";
 import MultipleChoice from "./questions/MultipleChoice";
 import Rating from "./questions/Rating";
 import YesNo from "./questions/YesNo";
+import FileUpload from "./questions/FileUpload";
 
 export default function FormRenderer() {
   const { slug } = useParams();
@@ -74,7 +75,7 @@ export default function FormRenderer() {
       return true;
     if (!currentQ.required) return true;
     const val = answers[currentQ.id];
-    if (val === undefined || val === "") return false;
+    if (val === undefined || val === "" || val === null) return false;
     if (
       currentQ.type === "multiple_choice" &&
       currentQ.settings?.multi_select &&
@@ -91,15 +92,36 @@ export default function FormRenderer() {
     if (submitted) return;
     setSubmitted(true);
     const duration = Math.round((Date.now() - startedAt) / 1000);
+
+    // Check if any answers contain File objects (file_upload questions)
+    const hasFiles = Object.values(answers).some((v) => v instanceof File);
+
     const answerPayload = Object.entries(answers).map(([questionId, value]) => ({
       question_id: questionId,
-      value,
+      value: value instanceof File ? questionId : value,
     }));
+
     try {
-      await submissions.submit(slug, {
-        answers: answerPayload,
-        metadata: { duration_seconds: duration },
-      });
+      if (hasFiles) {
+        const formData = new FormData();
+        formData.append("answers", JSON.stringify(answerPayload));
+        formData.append(
+          "metadata",
+          JSON.stringify({ duration_seconds: duration })
+        );
+        // Attach files keyed by question ID
+        Object.entries(answers).forEach(([questionId, value]) => {
+          if (value instanceof File) {
+            formData.append(questionId, value);
+          }
+        });
+        await submissions.submitWithFiles(slug, formData);
+      } else {
+        await submissions.submit(slug, {
+          answers: answerPayload,
+          metadata: { duration_seconds: duration },
+        });
+      }
     } catch {
       // Submission errors are silently accepted — the user sees thank-you regardless
     }
@@ -312,10 +334,21 @@ export default function FormRenderer() {
             number={currentNumber}
           />
         )}
+        {currentQ.type === "file_upload" && (
+          <FileUpload
+            question={currentQ}
+            value={answers[currentQ.id]}
+            onChange={setAnswer}
+            onNext={stableGoNext}
+            palette={palette}
+            styles={styles}
+            number={currentNumber}
+          />
+        )}
         {/* Fallback for unsupported question types */}
         {![
           "welcome", "thank_you", "text", "email", "long_text",
-          "multiple_choice", "rating", "yes_no",
+          "multiple_choice", "rating", "yes_no", "file_upload",
         ].includes(currentQ.type) && (
           <TextInput
             ref={inputRef}

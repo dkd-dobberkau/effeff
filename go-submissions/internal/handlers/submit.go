@@ -1,25 +1,34 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 
 	"github.com/formflow/go-submissions/internal/models"
-	"github.com/formflow/go-submissions/internal/store"
 	"github.com/formflow/go-submissions/internal/validator"
 )
 
+var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-]*[a-z0-9]$`)
+
+const maxUploadSize = 32 << 20 // 32 MB
+
 type Handler struct {
-	store *store.Store
+	store   FormStore
+	storage FileStorage
 }
 
-func New(s *store.Store) *Handler {
-	return &Handler{store: s}
+func New(s FormStore, fs FileStorage) *Handler {
+	return &Handler{store: s, storage: fs}
 }
 
 // SubmitForm handles POST /submit/:form_slug
@@ -27,6 +36,10 @@ func (h *Handler) SubmitForm(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "formSlug")
 	if slug == "" {
 		writeError(w, http.StatusBadRequest, "Form slug is required", nil)
+		return
+	}
+	if len(slug) < 2 || len(slug) > 100 || !slugPattern.MatchString(slug) {
+		writeError(w, http.StatusBadRequest, "Invalid form slug format", nil)
 		return
 	}
 
@@ -42,11 +55,88 @@ func (h *Handler) SubmitForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse request body
+	// Parse request — handle both JSON and multipart
 	var req models.SubmissionRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, "Invalid request body", nil)
-		return
+	contentType := r.Header.Get("Content-Type")
+
+	if strings.HasPrefix(contentType, "multipart/form-data") {
+		if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+			writeError(w, http.StatusBadRequest, "Failed to parse multipart form", nil)
+			return
+		}
+
+		// Extract answers JSON from form field
+		answersJSON := r.FormValue("answers")
+		if answersJSON == "" {
+			writeError(w, http.StatusBadRequest, "Missing answers field", nil)
+			return
+		}
+		if err := json.Unmarshal([]byte(answersJSON), &req.Answers); err != nil {
+			writeError(w, http.StatusBadRequest, "Invalid answers JSON", nil)
+			return
+		}
+
+		// Parse metadata
+		metaJSON := r.FormValue("metadata")
+		if metaJSON != "" {
+			json.Unmarshal([]byte(metaJSON), &req.Metadata)
+		}
+
+		// Parse started_at
+		if startedStr := r.FormValue("started_at"); startedStr != "" {
+			if t, err := time.Parse(time.RFC3339, startedStr); err == nil {
+				req.StartedAt = &t
+			}
+		}
+
+		// Handle file uploads — match file fields to file_upload questions
+		if h.storage != nil {
+			questionMap := make(map[string]models.Question)
+			for _, q := range form.Questions {
+				questionMap[q.ID] = q
+			}
+
+			for i, answer := range req.Answers {
+				q, exists := questionMap[answer.QuestionID]
+				if !exists || q.Type != "file_upload" {
+					continue
+				}
+
+				// Check if a file was uploaded for this question
+				file, header, err := r.FormFile(answer.QuestionID)
+				if err != nil {
+					continue // No file for this question
+				}
+				defer file.Close()
+
+				// Generate unique path
+				ext := filepath.Ext(header.Filename)
+				objectKey := fmt.Sprintf("forms/%s/%s/%s%s",
+					form.ID, q.ID, uuid.New().String(), ext)
+
+				url, err := h.storage.Upload(
+					context.Background(),
+					objectKey,
+					file,
+					header.Size,
+					header.Header.Get("Content-Type"),
+				)
+				if err != nil {
+					log.Printf("ERROR uploading file for question %s: %v", q.ID, err)
+					writeError(w, http.StatusInternalServerError, "File upload failed", nil)
+					return
+				}
+
+				// Replace answer value with the S3 URL
+				req.Answers[i].Value = url
+			}
+		}
+	} else {
+		// Standard JSON body
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeError(w, http.StatusBadRequest, "Invalid request body", nil)
+			return
+		}
 	}
 
 	// Validate

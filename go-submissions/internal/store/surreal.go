@@ -82,9 +82,14 @@ func (s *Store) surrealQuery(query string, vars map[string]interface{}) ([]json.
 
 // GetFormBySlug fetches a published form with its questions
 func (s *Store) GetFormBySlug(slug string) (*models.Form, error) {
+	if err := validateSlug(slug); err != nil {
+		return nil, fmt.Errorf("invalid slug: %w", err)
+	}
+
+	escaped := escapeString(slug)
 	query := fmt.Sprintf(`
 		SELECT * FROM form WHERE slug = '%s' AND status = 'published' LIMIT 1;
-	`, slug)
+	`, escaped)
 
 	results, err := s.surrealQuery(query, nil)
 	if err != nil {
@@ -105,6 +110,11 @@ func (s *Store) GetFormBySlug(slug string) (*models.Form, error) {
 	}
 
 	form := &forms[0]
+
+	// Validate the form ID before using it in the next query
+	if err := validateRecordID(form.ID); err != nil {
+		return nil, fmt.Errorf("invalid form ID from DB: %w", err)
+	}
 
 	// Fetch questions
 	qQuery := fmt.Sprintf(`
@@ -127,6 +137,10 @@ func (s *Store) GetFormBySlug(slug string) (*models.Form, error) {
 
 // CreateSubmission stores a new submission
 func (s *Store) CreateSubmission(sub *models.Submission) (string, error) {
+	if err := validateRecordID(sub.FormID); err != nil {
+		return "", fmt.Errorf("invalid form ID: %w", err)
+	}
+
 	answersJSON, _ := json.Marshal(sub.Answers)
 	metaJSON, _ := json.Marshal(sub.Metadata)
 
@@ -165,6 +179,10 @@ func (s *Store) CreateSubmission(sub *models.Submission) (string, error) {
 
 // IncrementFormStats updates the precomputed analytics
 func (s *Store) IncrementFormStats(formID string, durationSec int) error {
+	if err := validateRecordID(formID); err != nil {
+		return fmt.Errorf("invalid form ID: %w", err)
+	}
+
 	query := fmt.Sprintf(`
 		UPSERT form_stats SET
 			form_id = %s,

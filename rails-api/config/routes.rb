@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      # Auth
+      namespace :auth do
+        post :register
+        post :login
+        get :me
+        get :status
+      end
+
       resources :forms, param: :id do
         resources :questions, param: :id do
           collection do
@@ -13,8 +21,11 @@ Rails.application.routes.draw do
         end
       end
 
-      # Public endpoint: get form by slug for rendering
-      get "forms/public/:slug", to: "forms#show"
+      # Public endpoint: get published form by slug (no auth)
+      get "forms/public/:slug", to: "forms#public_show"
+
+      # File proxy (admin only)
+      get "files/*path", to: "files#show"
     end
   end
 

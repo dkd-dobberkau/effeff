@@ -1,6 +1,7 @@
 module Api
   module V1
     class FormsController < ApplicationController
+      skip_before_action :authenticate!, only: [:public_show]
       before_action :find_form, only: [:show, :update, :destroy, :submissions, :analytics]
 
       # GET /api/v1/forms
@@ -9,10 +10,17 @@ module Api
         render json: { forms: forms.map(&:as_json) }
       end
 
-      # GET /api/v1/forms/:slug
+      # GET /api/v1/forms/:id
       def show
         @form.load_questions!
         render json: { form: @form.as_json }
+      end
+
+      # GET /api/v1/forms/public/:slug (no auth required)
+      def public_show
+        slug = params[:slug]
+        form = Form.find_by_slug_published(slug)
+        render json: { form: form.as_json }
       end
 
       # POST /api/v1/forms
@@ -65,7 +73,7 @@ module Api
       private
 
       def find_form
-        identifier = params[:id] || params[:slug]
+        identifier = params[:id]
         @form = if identifier.to_s.start_with?("form:")
           Form.find(identifier)
         else
