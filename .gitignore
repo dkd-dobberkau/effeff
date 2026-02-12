@@ -25,8 +25,9 @@ Thumbs.db
 .codegraph/
 .playwright-mcp/
 
-# Screenshots (demo artifacts)
+# Screenshots (allow docs/screenshots/, ignore elsewhere)
 *.png
+!docs/screenshots/*.png
 
 # Go
 go-submissions/server
