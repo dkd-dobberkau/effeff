@@ -27,6 +27,7 @@ export default function FormRenderer() {
   const [submitted, setSubmitted] = useState(false);
   const [startedAt] = useState(Date.now());
   const inputRef = useRef(null);
+  const goNextRef = useRef(null);
 
   // Load form data
   useEffect(() => {
@@ -125,6 +126,10 @@ export default function FormRenderer() {
     }
   }, [currentIndex, isAnimating, canProceed, questionList, submitForm]);
 
+  // Keep ref in sync so delayed callbacks (setTimeout) always call the latest goNext
+  goNextRef.current = goNext;
+  const stableGoNext = useCallback(() => goNextRef.current(), []);
+
   const goPrev = useCallback(() => {
     if (isAnimating || !currentQ) return;
     if (currentIndex > 0 && currentQ.type !== "thank_you") {
@@ -205,7 +210,7 @@ export default function FormRenderer() {
       {showNav && (
         <Navigation
           onPrev={goPrev}
-          onNext={goNext}
+          onNext={stableGoNext}
           canGoPrev={currentIndex > 0}
           canGoNext={currentIndex < questionList.length - 1}
           palette={palette}
@@ -237,7 +242,7 @@ export default function FormRenderer() {
         shakeError={shakeError}
       >
         {currentQ.type === "welcome" && (
-          <Welcome question={currentQ} palette={palette} onNext={goNext} />
+          <Welcome question={currentQ} palette={palette} onNext={stableGoNext} />
         )}
         {currentQ.type === "thank_you" && (
           <ThankYou
@@ -256,7 +261,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
@@ -268,7 +273,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
@@ -279,7 +284,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
@@ -290,7 +295,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
@@ -301,7 +306,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
@@ -317,7 +322,7 @@ export default function FormRenderer() {
             question={currentQ}
             value={answers[currentQ.id]}
             onChange={setAnswer}
-            onNext={goNext}
+            onNext={stableGoNext}
             palette={palette}
             styles={styles}
             number={currentNumber}
