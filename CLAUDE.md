@@ -8,14 +8,15 @@ FormFlow is a self-hosted Typeform clone. Users create forms via an admin UI, pu
 
 ## Architecture
 
-Three services share one SurrealDB instance:
+Three services share one SurrealDB instance, with Garage for file storage:
 
-- **Rails API** (`rails-api/`, port 3000) – Form and question CRUD, submission reads, analytics. API-only mode, no ActiveRecord.
-- **Go Submissions** (`go-submissions/`, port 8080) – Receives and validates form submissions at high throughput. This is the only service that writes submissions.
+- **Rails API** (`rails-api/`, port 3000) – Form and question CRUD, submission reads, analytics, auth. API-only mode, no ActiveRecord.
+- **Go Submissions** (`go-submissions/`, port 8080) – Receives and validates form submissions at high throughput. Handles file uploads to S3. This is the only service that writes submissions.
 - **React Frontend** (`frontend-admin/`, port 5173) – Admin dashboard and public form renderer. Vite + React 18 + Tailwind CSS. Uses dnd-kit for drag-and-drop question reordering.
 - **SurrealDB** (port 8000) – Document-style NoSQL database. Schema defined in `docker/schema.surql`.
+- **Garage** (port 3900 S3 API, port 3903 admin) – S3-compatible object storage for file uploads. Config in `docker/garage.toml`.
 
-The split rationale: Rails handles the comfortable CRUD/admin work, Go handles the hot path (submissions) where throughput matters.
+The split rationale: Rails handles the comfortable CRUD/admin work, Go handles the hot path (submissions + file uploads) where throughput matters.
 
 ## Commands
 
@@ -58,7 +59,7 @@ No test suites exist yet. Rails has `rspec-rails` and `factory_bot_rails` in the
 
 ## Database (SurrealDB)
 
-Schema lives in `docker/schema.surql`. Four tables: `form`, `question`, `submission`, `form_stats`.
+Schema lives in `docker/schema.surql`. Five tables: `form`, `question`, `submission`, `form_stats`, `admin_user`.
 
 Connection details (dev): user `root`, pass `formflow_secret`, namespace `formflow`, database `main`. All services read credentials from env vars (`SURREAL_URL`/`SURREAL_HTTP_URL`, `SURREAL_USER`, `SURREAL_PASS`, `SURREAL_NS`, `SURREAL_DB`).
 
@@ -77,13 +78,24 @@ Models are plain Ruby classes that construct SurrealQL queries via `SurrealClien
 Key patterns:
 - `SURREAL.query(sql)` returns array of result sets, `query_first(sql)` returns first result set, `query_one(sql)` returns single record
 - Models use `from_surreal(record)` class methods to hydrate from hash results
-- String escaping is manual (`escape` method, single-quote escaping only) — be careful with user input
+- Input sanitization via `SurrealSanitizer` module (`lib/surreal_sanitizer.rb`): validates record IDs, slugs, statuses, integers and escapes strings for SurrealQL
 - Form slugs are auto-generated from title + random hex suffix
 - Questions are ordered by `position` field, reorderable via `PUT /api/v1/forms/:id/questions/reorder`
 
 Routes are namespaced under `/api/v1/`. Public form endpoint: `GET /api/v1/forms/public/:slug`.
 
-Error handling: `SurrealClient::QueryError` and `SurrealClient::NotFoundError` are rescued globally in `ApplicationController`.
+### Authentication
+
+JWT-based authentication (`lib/jwt_service.rb`). All admin endpoints require `Authorization: Bearer <token>` header. The following are public (no auth):
+- `GET /api/v1/forms/public/:slug` — public form rendering
+- `POST /api/v1/auth/login` — email/password login
+- `POST /api/v1/auth/register` — first user registers freely, subsequent require valid JWT
+- `GET /api/v1/auth/status` — returns `{ has_admin: true/false }`
+- `GET /api/v1/auth/me` — requires JWT, returns current user
+
+`AdminUser` model uses bcrypt for password hashing. JWT secret from `ENV['JWT_SECRET']`, HS256 algorithm, 24h expiry.
+
+Error handling: `SurrealClient::QueryError`, `SurrealClient::NotFoundError`, `SurrealSanitizer::InvalidInputError`, and `JWT::DecodeError` are rescued globally in `ApplicationController`.
 
 No SurrealDB connection retry (unlike Go which retries 30 times on startup).
 
@@ -98,20 +110,31 @@ Submission flow:
 4. On success, `store.CreateSubmission` writes to SurrealDB
 5. `store.IncrementFormStats` runs async in a goroutine
 
-Dependencies: chi (router), cors, httprate (rate limiting at 60/min per IP). No ORM.
+Dependencies: chi (router), cors, httprate (rate limiting at 60/min per IP), minio-go (S3 client), uuid. No ORM.
+
+Input sanitization via `store/sanitize.go`: validates slugs and record IDs before query construction.
+
+The handler supports both `application/json` and `multipart/form-data` submissions. Multipart is used when files are attached: `answers` JSON in a form field, files keyed by question ID.
+
+### File uploads
+
+S3-compatible storage via Garage (or any S3 backend). Files are uploaded to `forms/{formID}/{questionID}/{uuid}.{ext}`. Storage is optional — if `S3_ENDPOINT`/`S3_ACCESS_KEY`/`S3_SECRET_KEY` are not set, file uploads are disabled gracefully. Config env vars: `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_BUCKET`, `S3_USE_SSL`.
 
 Validation error messages are in **German** (user-facing).
 
 ## Frontend details
 
-The API client (`src/api/client.js`) exports three namespaces:
+The API client (`src/api/client.js`) exports four namespaces:
+- `auth.*` – login, register, me, status
 - `forms.*` – talks to Rails API for CRUD
 - `questions.*` – talks to Rails API for question management
-- `submissions.submit()` – talks to Go service
+- `submissions.submit()` / `submissions.submitWithFiles()` – talks to Go service
+
+The client auto-attaches `Authorization: Bearer` header from localStorage for Rails API calls. On 401, it clears the token and redirects to `/login`.
+
+Auth is managed via `AuthContext` (`src/context/AuthContext.jsx`). Admin routes are wrapped in `ProtectedRoute`. The login page auto-detects whether to show register (if no admin exists) or login form.
 
 Env vars: `VITE_RAILS_API_URL`, `VITE_GO_SUBMISSIONS_URL`.
-
-The admin UI and public form renderer are not yet built out — the API client is ready, the UI needs implementation.
 
 ## Cross-service sync points
 
@@ -134,7 +157,7 @@ Current valid types: `welcome`, `thank_you`, `text`, `email`, `long_text`, `mult
 
 ## Known limitations
 
-- No authentication (admin endpoints are open)
-- No file upload storage backend (question type exists but is non-functional)
-- Rails string escaping is basic — should use parameterized queries when SurrealDB Ruby client matures
 - No webhook dispatch on new submissions
+- Garage S3 requires manual init (`docker/garage-init.sh`) after first `docker compose up` — access key/secret must be copied to env vars
+- No password reset flow
+- No multi-tenant / organization support
