@@ -4,12 +4,9 @@ db_engine = "sqlite"
 
 replication_factor = 1
 
-[rpc_bind_addr]
-addr = "0.0.0.0:3901"
-
-[rpc_secret]
+rpc_bind_addr = "0.0.0.0:3901"
 # Static dev secret (change for production)
-secret = "4a89e4b4a8b14f5c9d3e2f1a7b8c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9"
+rpc_secret = "794be26a0f168c90661cfb3564de8fada6c03859c580070893c4bd677a79d81d"
 
 [s3_api]
 s3_region = "garage"
