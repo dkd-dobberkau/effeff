@@ -141,7 +141,17 @@ func (s *Store) CreateSubmission(sub *models.Submission) (string, error) {
 		return "", fmt.Errorf("invalid form ID: %w", err)
 	}
 
-	answersJSON, _ := json.Marshal(sub.Answers)
+	// Transform answers: rename "value" to "answer_value" for SurrealDB
+	// ("value" is a reserved keyword in SurrealDB and gets silently dropped)
+	type dbAnswer struct {
+		QuestionID  string      `json:"question_id"`
+		AnswerValue interface{} `json:"answer_value"`
+	}
+	dbAnswers := make([]dbAnswer, len(sub.Answers))
+	for i, a := range sub.Answers {
+		dbAnswers[i] = dbAnswer{QuestionID: a.QuestionID, AnswerValue: a.Value}
+	}
+	answersJSON, _ := json.Marshal(dbAnswers)
 	metaJSON, _ := json.Marshal(sub.Metadata)
 
 	query := fmt.Sprintf(`

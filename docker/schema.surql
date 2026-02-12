@@ -13,7 +13,8 @@ DEFINE FIELD theme        ON form FLEXIBLE TYPE object DEFAULT {
     bg_color: "#0a0a0f",
     accent_color: "#6c5ce7",
     font_family: "DM Sans",
-    logo_url: NONE
+    logo_url: NONE,
+    theme_mode: "dark"
 };
 DEFINE FIELD settings     ON form FLEXIBLE TYPE object DEFAULT {
     redirect_url: NONE,
@@ -64,8 +65,10 @@ DEFINE INDEX idx_question_position ON question COLUMNS form_id, position;
 DEFINE TABLE submission SCHEMAFULL;
 
 DEFINE FIELD form_id      ON submission TYPE record<form> ASSERT $value != NONE;
-DEFINE FIELD answers      ON submission TYPE array DEFAULT [];
--- Each answer: { question_id: record<question>, value: any }
+DEFINE FIELD answers             ON submission TYPE array DEFAULT [];
+DEFINE FIELD answers.*           ON submission FLEXIBLE TYPE object;
+DEFINE FIELD answers.*.question_id ON submission TYPE string;
+DEFINE FIELD answers.*.answer_value ON submission FLEXIBLE TYPE any;
 DEFINE FIELD metadata     ON submission FLEXIBLE TYPE object DEFAULT {};
 -- metadata: { ip, user_agent, referrer, duration_seconds }
 DEFINE FIELD started_at   ON submission TYPE option<datetime>;

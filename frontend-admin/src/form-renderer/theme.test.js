@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { hexToRgba, buildPalette, fontFamily, DEFAULT_PALETTE } from "./theme";
+import { hexToRgba, buildPalette, fontFamily, DEFAULT_PALETTE, DARK_PALETTE, LIGHT_PALETTE } from "./theme";
 
 describe("hexToRgba", () => {
   it("converts standard hex to rgba", () => {
@@ -56,6 +56,59 @@ describe("buildPalette", () => {
     expect(palette.border).toBe(DEFAULT_PALETTE.border);
     expect(palette.success).toBe(DEFAULT_PALETTE.success);
     expect(palette.errorRed).toBe(DEFAULT_PALETTE.errorRed);
+  });
+
+  it("uses dark palette by default (no theme_mode)", () => {
+    const palette = buildPalette({});
+    expect(palette.bg).toBe(DARK_PALETTE.bg);
+    expect(palette.text).toBe(DARK_PALETTE.text);
+  });
+
+  it("uses light palette when theme_mode is light", () => {
+    const palette = buildPalette({ theme_mode: "light" });
+    expect(palette.bg).toBe(LIGHT_PALETTE.bg);
+    expect(palette.text).toBe(LIGHT_PALETTE.text);
+    expect(palette.textMuted).toBe(LIGHT_PALETTE.textMuted);
+    expect(palette.border).toBe(LIGHT_PALETTE.border);
+    expect(palette.errorRed).toBe(LIGHT_PALETTE.errorRed);
+  });
+
+  it("uses dark palette when theme_mode is dark", () => {
+    const palette = buildPalette({ theme_mode: "dark" });
+    expect(palette.bg).toBe(DARK_PALETTE.bg);
+    expect(palette.text).toBe(DARK_PALETTE.text);
+  });
+
+  it("overrides accent_color in light mode with darkened hover", () => {
+    const palette = buildPalette({ theme_mode: "light", accent_color: "#ff0000" });
+    expect(palette.accent).toBe("#ff0000");
+    expect(palette.accentGlow).toBe("rgba(255, 0, 0, 0.15)");
+    // In light mode, hover is darkened (lower values)
+    expect(palette.accentHover).not.toBe(LIGHT_PALETTE.accentHover);
+  });
+
+  it("overrides bg_color in light mode", () => {
+    const palette = buildPalette({ theme_mode: "light", bg_color: "#f0f0f0" });
+    expect(palette.bg).toBe("#f0f0f0");
+    expect(palette.text).toBe(LIGHT_PALETTE.text);
+  });
+});
+
+describe("LIGHT_PALETTE", () => {
+  it("has light background", () => {
+    expect(LIGHT_PALETTE.bg).toBe("#ffffff");
+  });
+
+  it("has dark text", () => {
+    expect(LIGHT_PALETTE.text).toBe("#1a1a2e");
+  });
+
+  it("has same accent as dark palette", () => {
+    expect(LIGHT_PALETTE.accent).toBe(DARK_PALETTE.accent);
+  });
+
+  it("has lighter border", () => {
+    expect(LIGHT_PALETTE.border).toBe("#e2e2ea");
   });
 });
 

@@ -93,6 +93,9 @@ export const forms = {
     request(`${RAILS_API}/api/v1/forms/${encodeURIComponent(id)}/analytics`).then(
       (r) => r.analytics || r
     ),
+
+  exportSubmissions: (id) =>
+    request(`${RAILS_API}/api/v1/forms/${encodeURIComponent(id)}/export_submissions`),
 };
 
 // ─── Questions ─────────────────────────────────────────────

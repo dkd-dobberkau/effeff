@@ -18,6 +18,7 @@ Rails.application.routes.draw do
         member do
           get :submissions
           get :analytics
+          get :export_submissions
         end
       end
 

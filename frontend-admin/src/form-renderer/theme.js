@@ -1,4 +1,4 @@
-export const DEFAULT_PALETTE = {
+export const DARK_PALETTE = {
   bg: "#0a0a0f",
   bgCard: "#12121a",
   accent: "#6c5ce7",
@@ -14,19 +14,42 @@ export const DEFAULT_PALETTE = {
   white: "#ffffff",
 };
 
+export const LIGHT_PALETTE = {
+  bg: "#ffffff",
+  bgCard: "#f8f8fa",
+  accent: "#6c5ce7",
+  accentHover: "#5a4bd6",
+  accentGlow: "rgba(108, 92, 231, 0.15)",
+  text: "#1a1a2e",
+  textMuted: "#6b6b80",
+  textDim: "#9b9baf",
+  border: "#e2e2ea",
+  borderFocus: "#6c5ce7",
+  success: "#00b894",
+  errorRed: "#e74c3c",
+  white: "#ffffff",
+};
+
+// Keep for backward compatibility
+export const DEFAULT_PALETTE = DARK_PALETTE;
+
 export function buildPalette(formTheme) {
-  if (!formTheme) return DEFAULT_PALETTE;
+  if (!formTheme) return DARK_PALETTE;
+
+  const isLight = formTheme.theme_mode === "light";
+  const base = isLight ? LIGHT_PALETTE : DARK_PALETTE;
+
   return {
-    ...DEFAULT_PALETTE,
-    bg: formTheme.bg_color || DEFAULT_PALETTE.bg,
-    accent: formTheme.accent_color || DEFAULT_PALETTE.accent,
+    ...base,
+    bg: formTheme.bg_color || base.bg,
+    accent: formTheme.accent_color || base.accent,
     accentHover: formTheme.accent_color
-      ? lighten(formTheme.accent_color, 15)
-      : DEFAULT_PALETTE.accentHover,
+      ? (isLight ? darken(formTheme.accent_color, 15) : lighten(formTheme.accent_color, 15))
+      : base.accentHover,
     accentGlow: formTheme.accent_color
-      ? hexToRgba(formTheme.accent_color, 0.25)
-      : DEFAULT_PALETTE.accentGlow,
-    borderFocus: formTheme.accent_color || DEFAULT_PALETTE.borderFocus,
+      ? hexToRgba(formTheme.accent_color, isLight ? 0.15 : 0.25)
+      : base.accentGlow,
+    borderFocus: formTheme.accent_color || base.borderFocus,
   };
 }
 
@@ -52,7 +75,20 @@ function lighten(hex, percent) {
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
+function darken(hex, percent) {
+  let r = parseInt(hex.slice(1, 3), 16);
+  let g = parseInt(hex.slice(3, 5), 16);
+  let b = parseInt(hex.slice(5, 7), 16);
+  r = Math.max(0, r - Math.round(r * (percent / 100)));
+  g = Math.max(0, g - Math.round(g * (percent / 100)));
+  b = Math.max(0, b - Math.round(b * (percent / 100)));
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
+
 export function buildStyles(p, font) {
+  const isLight = p.bg === "#ffffff" || p.bg === LIGHT_PALETTE.bg;
+  const textareaBg = isLight ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.03)";
+
   return {
     root: {
       fontFamily: font,
@@ -136,7 +172,7 @@ export function buildStyles(p, font) {
     textarea: {
       width: "100%",
       padding: "16px",
-      background: "rgba(255,255,255,0.03)",
+      background: textareaBg,
       border: `1px solid ${p.border}`,
       borderRadius: "10px",
       color: p.text,
@@ -247,4 +283,3 @@ export function buildDynamicCSS(p) {
     }
   `;
 }
-

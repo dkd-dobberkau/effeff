@@ -83,6 +83,9 @@ Both Rails and Go talk to SurrealDB via its **HTTP REST API** (`POST /sql` with 
 ### SurrealDB record IDs
 IDs use `table:id` format (e.g., `form:abc123`, `question:xyz789`). In SurrealQL, reference them as bare IDs without quotes: `SELECT * FROM form:abc123`, `UPDATE question:xyz789 SET ...`, `WHERE form_id = form:abc123`.
 
+### SurrealDB reserved keywords
+`value` is a reserved keyword in SurrealDB v2.1 — it is silently dropped from objects even with backtick escaping. Submission answers store the answer data as `answer_value` in the DB. The Go store transforms `value` → `answer_value` on write, and the Rails Submission model maps `answer_value` → `value` on read. The external API always uses `value`. Additionally, nested object fields (`answers[*]`) must be `FLEXIBLE TYPE object` — strict `TYPE object` silently drops sub-fields.
+
 ### Modifying the schema
 Edit `docker/schema.surql` and re-import. `DEFINE TABLE` and `DEFINE FIELD` are idempotent.
 

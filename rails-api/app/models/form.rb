@@ -156,7 +156,7 @@ class Form
   end
 
   def default_theme
-    { bg_color: "#0a0a0f", accent_color: "#6c5ce7", font_family: "DM Sans" }
+    { bg_color: "#0a0a0f", accent_color: "#6c5ce7", font_family: "DM Sans", theme_mode: "dark" }
   end
 
   def default_settings

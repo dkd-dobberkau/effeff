@@ -48,55 +48,55 @@ export default function Login() {
 
   if (checkingStatus) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-700 border-t-accent" />
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-accent dark:border-gray-700" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center justify-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent">
             <span className="text-lg font-bold text-white">F</span>
           </div>
-          <span className="text-2xl font-semibold tracking-tight text-white">
+          <span className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
             FormFlow
           </span>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-gray-800 bg-gray-900/50 p-6"
+          className="rounded-xl border border-gray-200 bg-gray-100/50 p-6 dark:border-gray-800 dark:bg-gray-900/50"
         >
-          <h2 className="mb-6 text-center text-lg font-medium text-white">
+          <h2 className="mb-6 text-center text-lg font-medium text-gray-900 dark:text-white">
             {isRegister ? "Admin-Konto erstellen" : "Anmelden"}
           </h2>
 
           {error && (
-            <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
+            <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
 
           {isRegister && (
             <div className="mb-4">
-              <label className="mb-1.5 block text-sm font-medium text-gray-400">
+              <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
                 Name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-accent"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 outline-none transition-colors focus:border-accent dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 placeholder="Admin"
               />
             </div>
           )}
 
           <div className="mb-4">
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
               E-Mail
             </label>
             <input
@@ -104,14 +104,14 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-accent"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 outline-none transition-colors focus:border-accent dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               placeholder="admin@example.com"
               autoFocus
             />
           </div>
 
           <div className="mb-6">
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
               Passwort
             </label>
             <input
@@ -120,7 +120,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-accent"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 outline-none transition-colors focus:border-accent dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               placeholder="Mindestens 8 Zeichen"
             />
           </div>

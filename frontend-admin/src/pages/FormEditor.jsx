@@ -62,34 +62,34 @@ function SortableQuestion({ question, onEdit, onDelete }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 rounded-lg border border-gray-800 bg-gray-900/50 px-4 py-3 transition-colors hover:border-gray-700"
+      className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-100/50 px-4 py-3 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-700"
     >
       <button
         aria-label="Reihenfolge ändern"
         {...attributes}
         {...listeners}
-        className="cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing"
+        className="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing dark:text-gray-600 dark:hover:text-gray-400"
       >
         <GripVertical size={16} />
       </button>
-      <span className="shrink-0 rounded bg-gray-800 px-2 py-0.5 text-xs font-medium text-gray-400">
+      <span className="shrink-0 rounded bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
         {TYPE_LABELS[question.type] || question.type}
       </span>
       <span className="flex-1 truncate text-sm">{question.title}</span>
       {question.required && (
-        <span className="text-xs text-red-400">*</span>
+        <span className="text-xs text-red-600 dark:text-red-400">*</span>
       )}
       <button
         aria-label="Bearbeiten"
         onClick={() => onEdit(question)}
-        className="text-gray-600 hover:text-accent"
+        className="text-gray-400 hover:text-accent dark:text-gray-600"
       >
         <Pencil size={14} />
       </button>
       <button
         aria-label="Löschen"
         onClick={() => onDelete(question)}
-        className="text-gray-600 hover:text-red-400"
+        className="text-gray-400 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400"
       >
         <Trash2 size={14} />
       </button>
@@ -114,6 +114,7 @@ export default function FormEditor() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("draft");
+  const [themeMode, setThemeMode] = useState("dark");
   const [dirty, setDirty] = useState(false);
   const [savingForm, setSavingForm] = useState(false);
   const [saveError, setSaveError] = useState(null);
@@ -127,6 +128,7 @@ export default function FormEditor() {
       setTitle(form.title || "");
       setDescription(form.description || "");
       setStatus(form.status || "draft");
+      setThemeMode(form.theme?.theme_mode || "dark");
     }
   }, [form]);
 
@@ -158,7 +160,8 @@ export default function FormEditor() {
     setSavingForm(true);
     setSaveError(null);
     try {
-      await forms.update(id, { title, description, status });
+      const theme = { ...(form?.theme || {}), theme_mode: themeMode };
+      await forms.update(id, { title, description, status, theme });
       setDirty(false);
       refetchForm();
     } catch (err) {
@@ -207,14 +210,14 @@ export default function FormEditor() {
 
   if (formLoading || qLoading) return <Spinner className="mt-32" />;
   if (formError)
-    return <div className="mt-32 text-center text-red-400">Fehler: {formError}</div>;
+    return <div className="mt-32 text-center text-red-600 dark:text-red-400">Fehler: {formError}</div>;
   if (!form) return <div className="mt-32 text-center text-gray-500">Formular nicht gefunden.</div>;
 
   return (
     <div className="mx-auto max-w-3xl">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <Link to="/" className="text-sm text-gray-500 hover:text-gray-300">
+        <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
           &larr; Alle Formulare
         </Link>
         <div className="flex items-center gap-3">
@@ -240,14 +243,14 @@ export default function FormEditor() {
       </div>
 
       {/* Form details */}
-      <div className="mb-8 rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+      <div className="mb-8 rounded-xl border border-gray-200 bg-gray-100/50 p-6 dark:border-gray-800 dark:bg-gray-900/50">
         <div className="mb-4 flex items-start justify-between">
           <h2 className="text-lg font-semibold">Formular-Details</h2>
           <StatusBadge status={form.status} />
         </div>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">Titel</label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Titel</label>
             <input
               type="text"
               value={title}
@@ -255,12 +258,12 @@ export default function FormEditor() {
                 setTitle(e.target.value);
                 setDirty(true);
               }}
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">
-              Beschreibung <span className="text-gray-600">(optional)</span>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
+              Beschreibung <span className="text-gray-400 dark:text-gray-600">(optional)</span>
             </label>
             <textarea
               value={description}
@@ -269,22 +272,36 @@ export default function FormEditor() {
                 setDirty(true);
               }}
               rows={2}
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">Status</label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Status</label>
             <select
               value={status}
               onChange={(e) => {
                 setStatus(e.target.value);
                 setDirty(true);
               }}
-              className="w-48 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-48 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
             >
               <option value="draft">Entwurf</option>
               <option value="published">Veröffentlicht</option>
               <option value="archived">Archiviert</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Formular-Design</label>
+            <select
+              value={themeMode}
+              onChange={(e) => {
+                setThemeMode(e.target.value);
+                setDirty(true);
+              }}
+              className="w-48 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
+            >
+              <option value="dark">Dunkles Design</option>
+              <option value="light">Helles Design</option>
             </select>
           </div>
           {dirty && (
@@ -298,7 +315,7 @@ export default function FormEditor() {
                 {savingForm ? "Speichern..." : "Speichern"}
               </button>
               {saveError && (
-                <span className="text-sm text-red-400">{saveError}</span>
+                <span className="text-sm text-red-600 dark:text-red-400">{saveError}</span>
               )}
             </div>
           )}
@@ -306,12 +323,12 @@ export default function FormEditor() {
       </div>
 
       {/* Questions */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+      <div className="rounded-xl border border-gray-200 bg-gray-100/50 p-6 dark:border-gray-800 dark:bg-gray-900/50">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Fragen</h2>
           <button
             onClick={openNewQuestion}
-            className="flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700"
+            className="flex items-center gap-1.5 rounded-lg bg-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             <Plus size={14} />
             Frage hinzufügen
@@ -319,7 +336,7 @@ export default function FormEditor() {
         </div>
 
         {questionList.length === 0 ? (
-          <p className="py-8 text-center text-sm text-gray-600">
+          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-600">
             Noch keine Fragen. Füge deine erste Frage hinzu.
           </p>
         ) : (

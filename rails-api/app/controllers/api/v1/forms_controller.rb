@@ -2,7 +2,7 @@ module Api
   module V1
     class FormsController < ApplicationController
       skip_before_action :authenticate!, only: [:public_show]
-      before_action :find_form, only: [:show, :update, :destroy, :submissions, :analytics]
+      before_action :find_form, only: [:show, :update, :destroy, :submissions, :analytics, :export_submissions]
 
       # GET /api/v1/forms
       def index
@@ -61,6 +61,43 @@ module Api
         render json: {
           submissions: subs.map(&:as_json),
           meta: { total: total, page: page, per_page: per_page }
+        }
+      end
+
+      # GET /api/v1/forms/:id/export_submissions
+      def export_submissions
+        @form.load_questions!
+        question_map = @form.questions.each_with_object({}) do |q, map|
+          map[q.id] = { title: q.title, type: q.type }
+        end
+
+        subs = Submission.all_for_form(@form.id)
+
+        submissions = subs.map do |sub|
+          resolved = Array(sub.answers).map do |a|
+            qid = a["question_id"]
+            q_info = question_map[qid] || { title: qid, type: "unknown" }
+            {
+              question_id: qid,
+              question_title: q_info[:title],
+              question_type: q_info[:type],
+              value: a["value"]
+            }
+          end
+
+          {
+            id: sub.id,
+            completed_at: sub.completed_at,
+            started_at: sub.started_at,
+            duration_seconds: sub.metadata&.dig("duration_seconds"),
+            resolved_answers: resolved
+          }
+        end
+
+        render json: {
+          form_title: @form.title,
+          questions: @form.questions.map { |q| { id: q.id, title: q.title, type: q.type } },
+          submissions: submissions
         }
       end
 

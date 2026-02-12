@@ -22,6 +22,14 @@ class Submission
     Array(records).map { |r| from_surreal(r) }
   end
 
+  def self.all_for_form(form_id)
+    SurrealSanitizer.validate_record_id!(form_id)
+    records = SURREAL.query_first(
+      "SELECT * FROM submission WHERE form_id = #{form_id} ORDER BY completed_at DESC;"
+    )
+    Array(records).map { |r| from_surreal(r) }
+  end
+
   def self.find(id)
     SurrealSanitizer.validate_record_id!(id)
     record = SURREAL.query_one("SELECT * FROM #{id};")
@@ -80,10 +88,16 @@ class Submission
   end
 
   def self.from_surreal(record)
+    # Map "answer_value" back to "value" for API responses
+    # ("value" is a reserved keyword in SurrealDB, so we store as "answer_value")
+    raw_answers = Array(record["answers"]).map do |a|
+      { "question_id" => a["question_id"], "value" => a["answer_value"] }
+    end
+
     new(
       id:           record["id"],
       form_id:      record["form_id"],
-      answers:      record["answers"],
+      answers:      raw_answers,
       metadata:     record["metadata"],
       started_at:   record["started_at"],
       completed_at: record["completed_at"]

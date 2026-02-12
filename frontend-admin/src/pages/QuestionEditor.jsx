@@ -81,13 +81,13 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/50">
-      <div className="flex h-full w-full max-w-lg flex-col border-l border-gray-800 bg-gray-950">
+      <div className="flex h-full w-full max-w-lg flex-col border-l border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-800 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
           <h2 className="text-lg font-semibold">
             {question ? "Frage bearbeiten" : "Neue Frage"}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
             <X size={20} />
           </button>
         </div>
@@ -96,11 +96,11 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5">
           {/* Type */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">Typ</label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Typ</label>
             <select
               value={form.type}
               onChange={(e) => setField("type", e.target.value)}
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
             >
               {QUESTION_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -112,27 +112,27 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
 
           {/* Title */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">Titel</label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Titel</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setField("title", e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
               placeholder="Deine Frage..."
             />
           </div>
 
           {/* Subtitle */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-400">
-              Untertitel <span className="text-gray-600">(optional)</span>
+            <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
+              Untertitel <span className="text-gray-400 dark:text-gray-600">(optional)</span>
             </label>
             <input
               type="text"
               value={form.subtitle}
               onChange={(e) => setField("subtitle", e.target.value)}
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
               placeholder="Zusatzinfo..."
             />
           </div>
@@ -140,14 +140,14 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
           {/* Placeholder */}
           {showPlaceholder && (
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-400">
-                Platzhalter <span className="text-gray-600">(optional)</span>
+              <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
+                Platzhalter <span className="text-gray-400 dark:text-gray-600">(optional)</span>
               </label>
               <input
                 type="text"
                 value={form.placeholder}
                 onChange={(e) => setField("placeholder", e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
               />
             </div>
           )}
@@ -159,16 +159,16 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
                 type="checkbox"
                 checked={form.required}
                 onChange={(e) => setField("required", e.target.checked)}
-                className="h-4 w-4 rounded border-gray-600 bg-gray-800 accent-accent"
+                className="h-4 w-4 rounded border-gray-400 bg-gray-100 accent-accent dark:border-gray-600 dark:bg-gray-800"
               />
-              <span className="text-gray-300">Pflichtfeld</span>
+              <span className="text-gray-700 dark:text-gray-300">Pflichtfeld</span>
             </label>
           )}
 
           {/* Rating max */}
           {showRatingMax && (
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-400">
+              <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">
                 Maximale Bewertung
               </label>
               <input
@@ -179,7 +179,7 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
                 onChange={(e) =>
                   setField("settings", { ...form.settings, max: Number(e.target.value) })
                 }
-                className="w-24 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+                className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
               />
             </div>
           )}
@@ -187,11 +187,11 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
           {/* Multiple choice options */}
           {showOptions && (
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-400">Optionen</label>
+              <label className="mb-1.5 block text-sm font-medium text-gray-600 dark:text-gray-400">Optionen</label>
               <div className="flex flex-col gap-2">
                 {form.options.map((opt, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-700 text-xs font-bold text-gray-500">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-gray-300 text-xs font-bold text-gray-500 dark:border-gray-700">
                       {opt.key}
                     </span>
                     <input
@@ -199,12 +199,12 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
                       value={opt.label}
                       onChange={(e) => updateOption(idx, e.target.value)}
                       placeholder="Option..."
-                      className="flex-1 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                      className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-accent focus:outline-none dark:border-gray-700 dark:bg-gray-900"
                     />
                     <button
                       type="button"
                       onClick={() => removeOption(idx)}
-                      className="text-gray-600 hover:text-red-400"
+                      className="text-gray-400 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400"
                     >
                       <X size={16} />
                     </button>
@@ -226,9 +226,9 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
                   onChange={(e) =>
                     setField("settings", { ...form.settings, multi_select: e.target.checked })
                   }
-                  className="h-4 w-4 rounded border-gray-600 bg-gray-800 accent-accent"
+                  className="h-4 w-4 rounded border-gray-400 bg-gray-100 accent-accent dark:border-gray-600 dark:bg-gray-800"
                 />
-                <span className="text-gray-300">Mehrfachauswahl erlauben</span>
+                <span className="text-gray-700 dark:text-gray-300">Mehrfachauswahl erlauben</span>
               </label>
             </div>
           )}
@@ -237,7 +237,7 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
           <div className="flex-1" />
 
           {/* Actions */}
-          <div className="flex items-center gap-3 border-t border-gray-800 pt-4">
+          <div className="flex items-center gap-3 border-t border-gray-200 pt-4 dark:border-gray-800">
             <button
               type="submit"
               disabled={saving || !form.title.trim()}
@@ -248,7 +248,7 @@ export default function QuestionEditor({ question, onSave, onClose, saving }) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2.5 text-sm text-gray-400 hover:text-gray-200"
+              className="rounded-lg px-4 py-2.5 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
             >
               Abbrechen
             </button>

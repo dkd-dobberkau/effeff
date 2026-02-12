@@ -27,7 +27,7 @@ export default function FormsList() {
   if (loading) return <Spinner className="mt-32" />;
   if (error)
     return (
-      <div className="mt-32 text-center text-red-400">
+      <div className="mt-32 text-center text-red-600 dark:text-red-400">
         Fehler: {error}
         <button onClick={refetch} className="ml-3 underline">
           Erneut versuchen
@@ -53,7 +53,7 @@ export default function FormsList() {
 
       {formList.length === 0 ? (
         <div className="mt-24 text-center text-gray-500">
-          <FileText size={48} className="mx-auto mb-4 text-gray-700" />
+          <FileText size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-700" />
           <p>Noch keine Formulare vorhanden.</p>
           <p className="text-sm">Erstelle dein erstes Formular.</p>
         </div>
@@ -63,13 +63,13 @@ export default function FormsList() {
             <Link
               key={form.id}
               to={`/forms/${encodeURIComponent(form.id)}`}
-              className="group rounded-xl border border-gray-800 bg-gray-900/50 p-5 transition-colors hover:border-gray-700 hover:bg-gray-900"
+              className="group rounded-xl border border-gray-200 bg-gray-100/50 p-5 transition-colors hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-700 dark:hover:bg-gray-900"
             >
               <div className="mb-3 flex items-start justify-between">
                 <h2 className="font-semibold leading-snug">{form.title}</h2>
                 <ArrowRight
                   size={16}
-                  className="mt-1 shrink-0 text-gray-600 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-400"
+                  className="mt-1 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-600 dark:text-gray-600 dark:group-hover:text-gray-400"
                 />
               </div>
               {form.description && (
@@ -80,7 +80,7 @@ export default function FormsList() {
               <div className="flex items-center justify-between">
                 <StatusBadge status={form.status} />
                 {form.slug && (
-                  <span className="text-xs text-gray-600">/f/{form.slug}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-600">/f/{form.slug}</span>
                 )}
               </div>
             </Link>
