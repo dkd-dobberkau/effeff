@@ -1,0 +1,89 @@
+services:
+  # ─── SurrealDB ───────────────────────────────────────────
+  surrealdb:
+    image: surrealdb/surrealdb:v2.1
+    container_name: formflow-db
+    user: root
+    command: start --user root --pass formflow_secret --bind 0.0.0.0:8000 rocksdb:/data/formflow.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - surreal_data:/data
+    healthcheck:
+      test: ["CMD", "/surreal", "is-ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - formflow
+
+  # ─── Rails API ───────────────────────────────────────────
+  rails-api:
+    build:
+      context: ./rails-api
+      dockerfile: Dockerfile
+    container_name: formflow-rails
+    ports:
+      - "3000:3000"
+    environment:
+      SURREAL_URL: "ws://surrealdb:8000/rpc"
+      SURREAL_HTTP_URL: "http://surrealdb:8000"
+      SURREAL_USER: root
+      SURREAL_PASS: formflow_secret
+      SURREAL_NS: formflow
+      SURREAL_DB: main
+      RAILS_ENV: development
+      GO_SUBMISSIONS_URL: "http://go-submissions:8080"
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+    volumes:
+      - ./rails-api:/app
+    networks:
+      - formflow
+
+  # ─── Go Submission Service ───────────────────────────────
+  go-submissions:
+    build:
+      context: ./go-submissions
+      dockerfile: Dockerfile
+    container_name: formflow-go
+    ports:
+      - "8080:8080"
+    environment:
+      SURREAL_URL: "http://surrealdb:8000"
+      SURREAL_USER: root
+      SURREAL_PASS: formflow_secret
+      SURREAL_NS: formflow
+      SURREAL_DB: main
+      PORT: "8080"
+      RAILS_API_URL: "http://rails-api:3000"
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+    networks:
+      - formflow
+
+  # ─── React Frontend ─────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    container_name: formflow-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_RAILS_API_URL: "http://localhost:3000"
+      VITE_GO_SUBMISSIONS_URL: "http://localhost:8080"
+    volumes:
+      - ./frontend-admin:/app
+      - /app/node_modules
+    networks:
+      - formflow
+
+volumes:
+  surreal_data:
+
+networks:
+  formflow:
+    driver: bridge

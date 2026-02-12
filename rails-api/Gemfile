@@ -1,0 +1,20 @@
+source "https://rubygems.org"
+
+ruby "~> 3.3"
+
+gem "rails", "~> 7.1"
+gem "puma", ">= 5.0"
+gem "surrealdb", "~> 0.2"  # SurrealDB Ruby client
+gem "httparty"              # HTTP client for SurrealDB REST API
+gem "rack-cors"             # CORS support
+gem "jbuilder"              # JSON views
+gem "bootsnap", require: false
+
+group :development do
+  gem "debug", platforms: %i[mri windows]
+end
+
+group :test do
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+end

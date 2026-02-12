@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+vendor/bundle/
+
+# Build output
+frontend-admin/dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tool-generated
+.codegraph/
+.playwright-mcp/
+
+# Screenshots (demo artifacts)
+*.png
+
+# Go
+go-submissions/tmp/
+
+# Rails
+rails-api/tmp/
+rails-api/log/
+rails-api/storage/
+
+# Docker volumes
+docker/data/
