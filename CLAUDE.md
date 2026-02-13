@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## General Workflow
+
+When the user places a file in the project and references it, search thoroughly using `Glob` before saying it can't be found. Check the project root, common directories, and ask the user if still not located.
+
 ## What is effeff?
 
 effeff is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads. Five services orchestrated via Docker Compose.
@@ -196,6 +200,32 @@ Current valid types: `welcome`, `thank_you`, `text`, `email`, `long_text`, `mult
 - `docs/SETUP.md` — Full setup guide: Docker, local dev, Garage init, env vars, troubleshooting
 - `docs/ARCHITECTURE.md` — API reference, data model, auth, file uploads, question types
 - `docs/screenshots/` — 15 UI screenshots (admin dashboard + public form renderer)
+
+## Docker
+
+When working with Docker, always use `docker compose build --no-cache` or `--build` flag when testing changes to Dockerfiles or docker-compose configs. Never assume cached images reflect recent changes.
+
+When creating Dockerfiles based on existing images (e.g., Playwright), always check for existing users/UIDs before creating new ones. Run `id` or check `/etc/passwd` in the base image first.
+
+## Deployment & Infrastructure
+
+When deploying or making infrastructure changes (Mittwald, AWS, Docker stacks), always confirm the scope of the operation before executing. Specifically: `mw stack deploy` replaces the ENTIRE stack — never run destructive deployment commands without explicitly warning about side effects.
+
+Before running any deployment or infrastructure command, first present a summary of exactly what it will do — list what will be **created**, **modified**, and **deleted**. Wait for explicit user approval before executing.
+
+## Database Notes
+
+When working with SurrealDB, remember that schemafull/strict tables silently drop unrecognized fields including nested objects. Always use `FLEXIBLE TYPE object` for tables that store dynamic or nested data. The keyword `value` is reserved — use alternative column names like `answer_value`.
+
+## Verification & Testing
+
+After making changes, always verify the actual outcome rather than trusting status codes or logs alone. For example, if a form submission returns 'ok', still verify the data actually arrived at its destination (e.g., Google Sheets, database).
+
+After deploying or submitting data, use Playwright to verify the result end-to-end. Don't just check the HTTP status — navigate to the actual destination (Google Sheet, deployed URL, database UI) and confirm the data or page is actually there.
+
+## TYPO3
+
+For TYPO3 projects: always check the exact CLI commands available in the user's TYPO3 version before running them. Commands differ significantly between v12, v13, and v14. Also bump version in `ext_emconf.php` before creating a TER release.
 
 ## Known limitations
 

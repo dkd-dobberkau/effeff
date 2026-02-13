@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file_path=$(cat - | jq -r '.tool_input.file_path // .tool_input.filePath // empty') && if echo \"$file_path\" | grep -q '\\.go$'; then cd $(git rev-parse --show-toplevel) && go vet ./... 2>&1 | head -20; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(cat - | jq -r '.tool_input.file_path // .tool_input.filePath // empty') && if echo \"$file_path\" | grep -q '\\.py$'; then python -m py_compile \"$file_path\" 2>&1 | head -10; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
