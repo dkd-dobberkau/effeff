@@ -1,6 +1,6 @@
 # effeff
 
-A self-hosted Typeform alternative. Create forms, publish them, collect submissions — all on your own infrastructure.
+A self-hosted, open-source form builder. Create forms, publish them, collect submissions — all on your own infrastructure.
 
 Built with Rails, Go, React, SurrealDB, and Garage (S3-compatible storage).
 
@@ -123,4 +123,4 @@ curl http://localhost:3000/api/v1/forms/FORM_ID/analytics \
 
 ## License
 
-Private project.
+[MIT](LICENSE)
