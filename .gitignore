@@ -40,5 +40,8 @@ rails-api/tmp/
 rails-api/log/
 rails-api/storage/
 
+# Internal (not published)
+internal/
+
 # Docker volumes
 docker/data/
