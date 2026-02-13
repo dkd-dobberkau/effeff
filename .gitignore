@@ -28,6 +28,7 @@ Thumbs.db
 # Screenshots (allow docs/screenshots/, ignore elsewhere)
 *.png
 !docs/screenshots/*.png
+!landing/public/screenshots/*.png
 
 # Go
 go-submissions/server
