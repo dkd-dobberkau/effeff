@@ -13,7 +13,7 @@ export const ui = {
 
     // Hero
     "hero.title": "Build forms. Self-hosted.",
-    "hero.subtitle": "The open-source alternative to Typeform. Create beautiful forms, collect submissions, upload files — all on your own infrastructure.",
+    "hero.subtitle": "Like commercial form builders — but open source and self-hosted. Create beautiful forms, collect submissions, upload files — all on your own infrastructure.",
     "hero.cta_primary": "View on GitHub",
     "hero.cta_secondary": "Setup Guide",
 
@@ -48,10 +48,14 @@ export const ui = {
     // Footer
     "footer.built_by": "Built by",
     "footer.source": "Source Code",
+    "footer.imprint": "Legal Notice",
+    "footer.privacy": "Privacy Policy",
 
     // SEO
     "seo.title": "effeff — Self-hosted form builder",
-    "seo.description": "Create beautiful forms, collect submissions, upload files. Open-source Typeform alternative you can host yourself.",
+    "seo.description": "Create beautiful forms, collect submissions, upload files. Open-source form builder you can host yourself.",
+    "seo.imprint_title": "Legal Notice — effeff",
+    "seo.privacy_title": "Privacy Policy — effeff",
   },
   de: {
     // Nav
@@ -59,7 +63,7 @@ export const ui = {
 
     // Hero
     "hero.title": "Formulare erstellen. Selbst gehostet.",
-    "hero.subtitle": "Die Open-Source-Alternative zu Typeform. Erstelle Formulare, sammle Einsendungen, lade Dateien hoch — alles auf deiner eigenen Infrastruktur.",
+    "hero.subtitle": "Wie kommerzielle Formular-Tools — aber Open Source und selbst gehostet. Erstelle Formulare, sammle Einsendungen, lade Dateien hoch — alles auf deiner eigenen Infrastruktur.",
     "hero.cta_primary": "Auf GitHub ansehen",
     "hero.cta_secondary": "Setup-Anleitung",
 
@@ -94,9 +98,13 @@ export const ui = {
     // Footer
     "footer.built_by": "Erstellt von",
     "footer.source": "Quellcode",
+    "footer.imprint": "Impressum",
+    "footer.privacy": "Datenschutz",
 
     // SEO
     "seo.title": "effeff — Selbst-gehosteter Formular-Builder",
-    "seo.description": "Erstelle Formulare, sammle Einsendungen, lade Dateien hoch. Die Open-Source Typeform-Alternative zum Selbsthosten.",
+    "seo.description": "Erstelle Formulare, sammle Einsendungen, lade Dateien hoch. Der Open-Source Formular-Builder zum Selbsthosten.",
+    "seo.imprint_title": "Impressum — effeff",
+    "seo.privacy_title": "Datenschutz — effeff",
   },
 } as const;

@@ -3,8 +3,14 @@ import "../styles/global.css";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import Nav from "../components/Nav.astro";
 
+interface Props {
+  title?: string;
+  description?: string;
+}
+
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const { title, description } = Astro.props;
 ---
 
 <!doctype html>
@@ -12,8 +18,8 @@ const t = useTranslations(lang);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{t("seo.title")}</title>
-    <meta name="description" content={t("seo.description")} />
+    <title>{title || t("seo.title")}</title>
+    <meta name="description" content={description || t("seo.description")} />
     <link rel="alternate" hreflang="en" href="/en/" />
     <link rel="alternate" hreflang="de" href="/de/" />
     <link rel="alternate" hreflang="x-default" href="/en/" />
