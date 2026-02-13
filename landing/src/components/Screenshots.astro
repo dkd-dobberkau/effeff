@@ -1,0 +1,30 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const screenshots = [
+  { src: "/screenshots/01-forms-list.png", alt: "Form list dashboard" },
+  { src: "/screenshots/02-form-editor.png", alt: "Form editor with questions" },
+  { src: "/screenshots/04-submissions.png", alt: "Submission analytics" },
+  { src: "/screenshots/05-welcome.png", alt: "Public form welcome screen" },
+  { src: "/screenshots/08-multiple-choice.png", alt: "Multiple choice question" },
+  { src: "/screenshots/09-rating.png", alt: "Rating question" },
+];
+---
+
+<section class="py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900">
+      {t("screenshots.heading")}
+    </h2>
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {screenshots.map(({ src, alt }) => (
+        <div class="rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+          <img src={src} alt={alt} class="w-full" loading="lazy" />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
