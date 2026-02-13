@@ -1,5 +1,5 @@
--- FormFlow SurrealDB Schema
--- Run: surreal import --conn http://localhost:8000 --user root --pass formflow_secret --ns formflow --db main schema.surql
+-- effeff SurrealDB Schema
+-- Run: surreal import --conn http://localhost:8000 --user root --pass effeff_secret --ns effeff --db main schema.surql
 
 -- ─── Forms ─────────────────────────────────────────────────
 

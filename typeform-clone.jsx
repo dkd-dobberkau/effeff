@@ -591,7 +591,7 @@ export default function TypeformClone() {
       {/* Footer branding */}
       <div style={styles.footer}>
         <span style={styles.footerText}>
-          Erstellt mit <span style={{ color: PALETTE.accent }}>FormFlow</span>
+          Erstellt mit <span style={{ color: PALETTE.accent }}>effeff</span>
         </span>
       </div>
     </div>

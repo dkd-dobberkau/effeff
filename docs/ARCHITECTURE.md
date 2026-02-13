@@ -1,8 +1,8 @@
-# FormFlow Architecture
+# effeff Architecture
 
 ## Overview
 
-FormFlow is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads.
+effeff is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads.
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────┐

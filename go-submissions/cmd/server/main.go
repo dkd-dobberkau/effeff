@@ -12,9 +12,9 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 
-	"github.com/formflow/go-submissions/internal/handlers"
-	"github.com/formflow/go-submissions/internal/storage"
-	"github.com/formflow/go-submissions/internal/store"
+	"github.com/dkd-dobberkau/effeff-go/internal/handlers"
+	"github.com/dkd-dobberkau/effeff-go/internal/storage"
+	"github.com/dkd-dobberkau/effeff-go/internal/store"
 )
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 	s3Endpoint := getEnv("S3_ENDPOINT", "")
 	s3AccessKey := getEnv("S3_ACCESS_KEY", "")
 	s3SecretKey := getEnv("S3_SECRET_KEY", "")
-	s3Bucket := getEnv("S3_BUCKET", "formflow-uploads")
+	s3Bucket := getEnv("S3_BUCKET", "effeff-uploads")
 	s3UseSSL := getEnv("S3_USE_SSL", "false") == "true"
 
 	if s3Endpoint != "" && s3AccessKey != "" && s3SecretKey != "" {
@@ -88,7 +88,7 @@ func main() {
 	port := getEnv("PORT", "8080")
 	addr := fmt.Sprintf(":%s", port)
 
-	log.Printf("FormFlow Submissions Service starting on %s", addr)
+	log.Printf("effeff Submissions Service starting on %s", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}

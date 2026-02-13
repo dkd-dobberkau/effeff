@@ -1,4 +1,4 @@
-# FormFlow Setup Guide
+# effeff Setup Guide
 
 ## Prerequisites
 
@@ -31,8 +31,8 @@ Required on first run, or after schema changes:
 ```bash
 docker compose exec surrealdb /bin/sh -c \
   "curl -X POST 'http://localhost:8000/import' \
-    -H 'surreal-ns: formflow' -H 'surreal-db: main' \
-    -u 'root:formflow_secret' \
+    -H 'surreal-ns: effeff' -H 'surreal-db: main' \
+    -u 'root:effeff_secret' \
     --data-binary @/docker/schema.surql"
 ```
 
@@ -62,7 +62,7 @@ Garage S3 credentials:
   S3_ACCESS_KEY=GKxxxxxxxxxxxxxxxxxxxx
   S3_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   S3_ENDPOINT=garage:3900
-  S3_BUCKET=formflow-uploads
+  S3_BUCKET=effeff-uploads
 ============================================
 ```
 
@@ -105,12 +105,12 @@ Export environment variables (or create `.env`):
 ```bash
 export SURREAL_HTTP_URL="http://localhost:8000"
 export SURREAL_USER="root"
-export SURREAL_PASS="formflow_secret"
-export SURREAL_NS="formflow"
+export SURREAL_PASS="effeff_secret"
+export SURREAL_NS="effeff"
 export SURREAL_DB="main"
-export JWT_SECRET="formflow_dev_jwt_secret_change_in_production"
+export JWT_SECRET="effeff_dev_jwt_secret_change_in_production"
 export S3_ENDPOINT="http://localhost:3900"
-export S3_BUCKET="formflow-uploads"
+export S3_BUCKET="effeff-uploads"
 ```
 
 ```bash
@@ -129,14 +129,14 @@ Export environment variables:
 ```bash
 export SURREAL_URL="http://localhost:8000"
 export SURREAL_USER="root"
-export SURREAL_PASS="formflow_secret"
-export SURREAL_NS="formflow"
+export SURREAL_PASS="effeff_secret"
+export SURREAL_NS="effeff"
 export SURREAL_DB="main"
 export PORT="8080"
 export S3_ENDPOINT="localhost:3900"
 export S3_ACCESS_KEY="<from garage-init>"
 export S3_SECRET_KEY="<from garage-init>"
-export S3_BUCKET="formflow-uploads"
+export S3_BUCKET="effeff-uploads"
 export S3_USE_SSL="false"
 ```
 
@@ -189,8 +189,8 @@ cd rails-api && bundle exec rspec
 |---------|-------|
 | URL | http://localhost:8000 |
 | User | root |
-| Password | formflow_secret |
-| Namespace | formflow |
+| Password | effeff_secret |
+| Namespace | effeff |
 | Database | main |
 
 ### Schema changes
@@ -201,8 +201,8 @@ Edit `docker/schema.surql` and re-import. All `DEFINE` statements are idempotent
 
 ```bash
 curl -X POST 'http://localhost:8000/sql' \
-  -H 'surreal-ns: formflow' -H 'surreal-db: main' \
-  -u 'root:formflow_secret' \
+  -H 'surreal-ns: effeff' -H 'surreal-db: main' \
+  -u 'root:effeff_secret' \
   -d 'SELECT * FROM form'
 ```
 

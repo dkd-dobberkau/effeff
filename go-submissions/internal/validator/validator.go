@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/formflow/go-submissions/internal/models"
+	"github.com/dkd-dobberkau/effeff-go/internal/models"
 )
 
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)

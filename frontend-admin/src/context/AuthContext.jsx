@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("formflow_token"));
+  const [token, setToken] = useState(() => localStorage.getItem("effeff_token"));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
       .me()
       .then((data) => setUser(data.user))
       .catch(() => {
-        localStorage.removeItem("formflow_token");
+        localStorage.removeItem("effeff_token");
         setToken(null);
       })
       .finally(() => setLoading(false));
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const data = await auth.login(email, password);
-    localStorage.setItem("formflow_token", data.token);
+    localStorage.setItem("effeff_token", data.token);
     setToken(data.token);
     setUser(data.user);
     return data;
@@ -33,14 +33,14 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(async (email, password, name) => {
     const data = await auth.register(email, password, name);
-    localStorage.setItem("formflow_token", data.token);
+    localStorage.setItem("effeff_token", data.token);
     setToken(data.token);
     setUser(data.user);
     return data;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("formflow_token");
+    localStorage.removeItem("effeff_token");
     setToken(null);
     setUser(null);
   }, []);

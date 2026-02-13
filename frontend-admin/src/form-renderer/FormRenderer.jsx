@@ -367,7 +367,7 @@ export default function FormRenderer() {
       <div style={styles.footer}>
         <span style={styles.footerText}>
           Erstellt mit{" "}
-          <span style={{ color: palette.accent }}>FormFlow</span>
+          <span style={{ color: palette.accent }}>effeff</span>
         </span>
       </div>
     </div>

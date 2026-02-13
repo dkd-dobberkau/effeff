@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/formflow/go-submissions/internal/models"
-	"github.com/formflow/go-submissions/internal/storage"
+	"github.com/dkd-dobberkau/effeff-go/internal/models"
+	"github.com/dkd-dobberkau/effeff-go/internal/storage"
 )
 
 // FormStore defines the store operations needed by handlers.

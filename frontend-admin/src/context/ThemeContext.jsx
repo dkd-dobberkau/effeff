@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState(() => localStorage.getItem("formflow_theme") || "dark");
+  const [mode, setMode] = useState(() => localStorage.getItem("effeff_theme") || "dark");
 
   useEffect(() => {
     const root = document.documentElement;
@@ -12,7 +12,7 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove("dark");
     }
-    localStorage.setItem("formflow_theme", mode);
+    localStorage.setItem("effeff_theme", mode);
   }, [mode]);
 
   const toggleTheme = useCallback(() => {

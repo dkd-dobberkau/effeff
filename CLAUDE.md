@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What is FormFlow?
+## What is effeff?
 
-FormFlow is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads. Five services orchestrated via Docker Compose.
+effeff is a self-hosted Typeform clone. Users create forms via an admin UI, publish them, and collect submissions including file uploads. Five services orchestrated via Docker Compose.
 
 ## Architecture
 
@@ -27,8 +27,8 @@ docker compose up --build
 # Init DB schema (required on first run):
 docker compose exec surrealdb /bin/sh -c \
   "curl -X POST 'http://localhost:8000/import' \
-    -H 'surreal-ns: formflow' -H 'surreal-db: main' \
-    -u 'root:formflow_secret' \
+    -H 'surreal-ns: effeff' -H 'surreal-db: main' \
+    -u 'root:effeff_secret' \
     --data-binary @/docker/schema.surql"
 
 # Init Garage S3 (required on first run, after garage is healthy):
@@ -76,7 +76,7 @@ cd rails-api && bundle exec rspec
 
 Schema lives in `docker/schema.surql`. Five tables: `form`, `question`, `submission`, `form_stats`, `admin_user`.
 
-Connection details (dev): user `root`, pass `formflow_secret`, namespace `formflow`, database `main`. All services read credentials from env vars (`SURREAL_URL`/`SURREAL_HTTP_URL`, `SURREAL_USER`, `SURREAL_PASS`, `SURREAL_NS`, `SURREAL_DB`).
+Connection details (dev): user `root`, pass `effeff_secret`, namespace `effeff`, database `main`. All services read credentials from env vars (`SURREAL_URL`/`SURREAL_HTTP_URL`, `SURREAL_USER`, `SURREAL_PASS`, `SURREAL_NS`, `SURREAL_DB`).
 
 Both Rails and Go talk to SurrealDB via its **HTTP REST API** (`POST /sql` with raw SurrealQL). Neither uses WebSocket RPC.
 
@@ -124,7 +124,7 @@ No SurrealDB connection retry (unlike Go which retries 30 times on startup).
 
 ## Go Submissions details
 
-Module path: `github.com/formflow/go-submissions`
+Module path: `github.com/dkd-dobberkau/effeff-go`
 
 Submission flow:
 1. `POST /submit/{formSlug}` hits `handlers.SubmitForm`

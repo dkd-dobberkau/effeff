@@ -21,7 +21,7 @@ export default function Layout() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
             <span className="text-sm font-bold text-white">F</span>
           </div>
-          <span className="text-lg font-semibold tracking-tight">FormFlow</span>
+          <span className="text-lg font-semibold tracking-tight">effeff</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink

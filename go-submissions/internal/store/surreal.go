@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/formflow/go-submissions/internal/models"
+	"github.com/dkd-dobberkau/effeff-go/internal/models"
 )
 
 // Store handles SurrealDB interactions via HTTP API
@@ -27,8 +27,8 @@ func New() *Store {
 	return &Store{
 		baseURL:   getEnv("SURREAL_URL", "http://localhost:8000"),
 		user:      getEnv("SURREAL_USER", "root"),
-		pass:      getEnv("SURREAL_PASS", "formflow_secret"),
-		namespace: getEnv("SURREAL_NS", "formflow"),
+		pass:      getEnv("SURREAL_PASS", "effeff_secret"),
+		namespace: getEnv("SURREAL_NS", "effeff"),
 		database:  getEnv("SURREAL_DB", "main"),
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,

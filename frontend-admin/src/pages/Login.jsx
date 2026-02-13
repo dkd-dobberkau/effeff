@@ -62,7 +62,7 @@ export default function Login() {
             <span className="text-lg font-bold text-white">F</span>
           </div>
           <span className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-            FormFlow
+            effeff
           </span>
         </div>
 

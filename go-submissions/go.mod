@@ -1,4 +1,4 @@
-module github.com/formflow/go-submissions
+module github.com/dkd-dobberkau/effeff-go
 
 go 1.24.0
 

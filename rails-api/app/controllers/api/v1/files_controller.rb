@@ -13,7 +13,7 @@ module Api
 
         # Construct the S3 URL
         s3_endpoint = ENV.fetch("S3_ENDPOINT", "http://localhost:3900")
-        s3_bucket = ENV.fetch("S3_BUCKET", "formflow-uploads")
+        s3_bucket = ENV.fetch("S3_BUCKET", "effeff-uploads")
         file_url = "#{s3_endpoint}/#{s3_bucket}/#{file_path}"
 
         # Proxy the file from S3

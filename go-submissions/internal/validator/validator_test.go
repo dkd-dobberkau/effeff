@@ -3,7 +3,7 @@ package validator
 import (
 	"testing"
 
-	"github.com/formflow/go-submissions/internal/models"
+	"github.com/dkd-dobberkau/effeff-go/internal/models"
 )
 
 func makeForm(questions []models.Question) *models.Form {

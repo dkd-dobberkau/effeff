@@ -7,7 +7,7 @@
 set -e
 
 GARAGE_ADMIN="${GARAGE_ADMIN:-http://garage:3903}"
-ADMIN_TOKEN="formflow_garage_admin_token"
+ADMIN_TOKEN="effeff_garage_admin_token"
 
 echo "Waiting for Garage admin API at $GARAGE_ADMIN..."
 for i in $(seq 1 30); do
@@ -44,10 +44,10 @@ curl -sf -X POST -H "Authorization: Bearer $ADMIN_TOKEN" \
   "$GARAGE_ADMIN/v2/ApplyClusterLayout" > /dev/null || true
 
 # Create bucket
-echo "Creating bucket formflow-uploads..."
+echo "Creating bucket effeff-uploads..."
 BUCKET_RESP=$(curl -sf -X POST -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"globalAlias": "formflow-uploads"}' \
+  -d '{"globalAlias": "effeff-uploads"}' \
   "$GARAGE_ADMIN/v2/CreateBucket" 2>/dev/null || echo "")
 
 if [ -n "$BUCKET_RESP" ]; then
@@ -58,7 +58,7 @@ else
   BUCKET_ID=$(curl -sf -H "Authorization: Bearer $ADMIN_TOKEN" "$GARAGE_ADMIN/v2/ListBuckets" | python3 -c "
 import sys, json
 for b in json.load(sys.stdin):
-  if 'formflow-uploads' in b.get('globalAliases', []):
+  if 'effeff-uploads' in b.get('globalAliases', []):
     print(b['id']); break
 " 2>/dev/null || true)
   echo "Bucket ID: $BUCKET_ID"
@@ -68,7 +68,7 @@ fi
 echo "Creating access key..."
 KEY_RESPONSE=$(curl -sf -X POST -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name": "formflow-app"}' \
+  -d '{"name": "effeff-app"}' \
   "$GARAGE_ADMIN/v2/CreateKey" 2>/dev/null || true)
 
 if [ -n "$KEY_RESPONSE" ]; then
@@ -89,7 +89,7 @@ if [ -n "$KEY_RESPONSE" ]; then
   echo "  S3_ACCESS_KEY=$ACCESS_KEY"
   echo "  S3_SECRET_KEY=$SECRET_KEY"
   echo "  S3_ENDPOINT=garage:3900"
-  echo "  S3_BUCKET=formflow-uploads"
+  echo "  S3_BUCKET=effeff-uploads"
   echo "============================================"
   echo ""
   echo "Add these to go-submissions environment in docker-compose.yml,"

@@ -2,9 +2,9 @@ services:
   # ─── SurrealDB ───────────────────────────────────────────
   surrealdb:
     image: surrealdb/surrealdb:v2.1
-    container_name: formflow-db
+    container_name: effeff-db
     user: root
-    command: start --user root --pass formflow_secret --bind 0.0.0.0:8000 rocksdb:/data/formflow.db
+    command: start --user root --pass effeff_secret --bind 0.0.0.0:8000 rocksdb:/data/effeff.db
     ports:
       - "8000:8000"
     volumes:
@@ -15,12 +15,12 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - formflow
+      - effeff
 
   # ─── Garage (S3-compatible object storage) ─────────────
   garage:
     image: dxflrs/garage:v2.2.0
-    container_name: formflow-garage
+    container_name: effeff-garage
     ports:
       - "3900:3900"
       - "3903:3903"
@@ -34,62 +34,62 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - formflow
+      - effeff
 
   # ─── Rails API ───────────────────────────────────────────
   rails-api:
     build:
       context: ./rails-api
       dockerfile: Dockerfile
-    container_name: formflow-rails
+    container_name: effeff-rails
     ports:
       - "3000:3000"
     environment:
       SURREAL_URL: "ws://surrealdb:8000/rpc"
       SURREAL_HTTP_URL: "http://surrealdb:8000"
       SURREAL_USER: root
-      SURREAL_PASS: formflow_secret
-      SURREAL_NS: formflow
+      SURREAL_PASS: effeff_secret
+      SURREAL_NS: effeff
       SURREAL_DB: main
       RAILS_ENV: development
       GO_SUBMISSIONS_URL: "http://go-submissions:8080"
-      JWT_SECRET: "formflow_dev_jwt_secret_change_in_production"
+      JWT_SECRET: "effeff_dev_jwt_secret_change_in_production"
       S3_ENDPOINT: "http://garage:3900"
-      S3_BUCKET: "formflow-uploads"
+      S3_BUCKET: "effeff-uploads"
     depends_on:
       surrealdb:
         condition: service_healthy
     volumes:
       - ./rails-api:/app
     networks:
-      - formflow
+      - effeff
 
   # ─── Go Submission Service ───────────────────────────────
   go-submissions:
     build:
       context: ./go-submissions
       dockerfile: Dockerfile
-    container_name: formflow-go
+    container_name: effeff-go
     ports:
       - "8080:8080"
     environment:
       SURREAL_URL: "http://surrealdb:8000"
       SURREAL_USER: root
-      SURREAL_PASS: formflow_secret
-      SURREAL_NS: formflow
+      SURREAL_PASS: effeff_secret
+      SURREAL_NS: effeff
       SURREAL_DB: main
       PORT: "8080"
       RAILS_API_URL: "http://rails-api:3000"
       S3_ENDPOINT: "garage:3900"
       S3_ACCESS_KEY: "GKc19cbaae621e18a33d9dd0c5"
       S3_SECRET_KEY: "55954e971011f4b432358c89c071da14d43c870538ab864ab86379acbfc0e72c"
-      S3_BUCKET: "formflow-uploads"
+      S3_BUCKET: "effeff-uploads"
       S3_USE_SSL: "false"
     depends_on:
       surrealdb:
         condition: service_healthy
     networks:
-      - formflow
+      - effeff
 
   # ─── React Frontend ─────────────────────────────────────
   frontend:
@@ -99,14 +99,14 @@ services:
       args:
         VITE_RAILS_API_URL: ""
         VITE_GO_SUBMISSIONS_URL: ""
-    container_name: formflow-frontend
+    container_name: effeff-frontend
     ports:
       - "5173:80"
     depends_on:
       - rails-api
       - go-submissions
     networks:
-      - formflow
+      - effeff
 
 volumes:
   surreal_data:
@@ -114,5 +114,5 @@ volumes:
   garage_data:
 
 networks:
-  formflow:
+  effeff:
     driver: bridge

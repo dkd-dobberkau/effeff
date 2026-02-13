@@ -31,5 +31,5 @@ Rails.application.routes.draw do
   end
 
   # Health check
-  get "health", to: proc { [200, { "Content-Type" => "application/json" }, ['{"status":"healthy","service":"formflow-rails"}']] }
+  get "health", to: proc { [200, { "Content-Type" => "application/json" }, ['{"status":"healthy","service":"effeff-rails"}']] }
 end

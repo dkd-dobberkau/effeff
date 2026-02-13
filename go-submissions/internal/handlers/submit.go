@@ -14,8 +14,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"github.com/formflow/go-submissions/internal/models"
-	"github.com/formflow/go-submissions/internal/validator"
+	"github.com/dkd-dobberkau/effeff-go/internal/models"
+	"github.com/dkd-dobberkau/effeff-go/internal/validator"
 )
 
 var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-]*[a-z0-9]$`)
@@ -200,7 +200,7 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"status":  "healthy",
-		"service": "formflow-submissions",
+		"service": "effeff-submissions",
 	})
 }
 

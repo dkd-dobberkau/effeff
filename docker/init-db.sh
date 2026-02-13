@@ -9,9 +9,9 @@ done
 echo "✅ SurrealDB is up. Importing schema..."
 curl -s -X POST "http://surrealdb:8000/import" \
   -H "Accept: application/json" \
-  -H "surreal-ns: formflow" \
+  -H "surreal-ns: effeff" \
   -H "surreal-db: main" \
-  -u "root:formflow_secret" \
+  -u "root:effeff_secret" \
   --data-binary @/docker/schema.surql
 
 echo "✅ Schema imported successfully."

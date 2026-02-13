@@ -12,8 +12,8 @@ class SurrealClient
   def initialize
     @base_url = ENV.fetch("SURREAL_HTTP_URL", "http://localhost:8000")
     @user     = ENV.fetch("SURREAL_USER", "root")
-    @pass     = ENV.fetch("SURREAL_PASS", "formflow_secret")
-    @ns       = ENV.fetch("SURREAL_NS", "formflow")
+    @pass     = ENV.fetch("SURREAL_PASS", "effeff_secret")
+    @ns       = ENV.fetch("SURREAL_NS", "effeff")
     @db       = ENV.fetch("SURREAL_DB", "main")
   end
 

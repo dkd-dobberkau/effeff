@@ -6,7 +6,7 @@ async function request(url, options = {}) {
 
   // Attach auth token for Rails API calls
   if (url.startsWith(RAILS_API)) {
-    const token = localStorage.getItem("formflow_token");
+    const token = localStorage.getItem("effeff_token");
     if (token) headers["Authorization"] = `Bearer ${token}`;
   }
 
@@ -19,7 +19,7 @@ async function request(url, options = {}) {
 
   // On 401 from Rails API, clear token and redirect to login
   if (res.status === 401 && url.startsWith(RAILS_API) && !url.includes("/auth/")) {
-    localStorage.removeItem("formflow_token");
+    localStorage.removeItem("effeff_token");
     window.location.href = "/login";
     throw new Error("Session expired");
   }

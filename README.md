@@ -1,4 +1,4 @@
-# FormFlow
+# effeff
 
 A self-hosted Typeform alternative. Create forms, publish them, collect submissions — all on your own infrastructure.
 
@@ -74,8 +74,8 @@ docker compose up --build
 # 2. Import database schema (first run only)
 docker compose exec surrealdb /bin/sh -c \
   "curl -X POST 'http://localhost:8000/import' \
-    -H 'surreal-ns: formflow' -H 'surreal-db: main' \
-    -u 'root:formflow_secret' \
+    -H 'surreal-ns: effeff' -H 'surreal-db: main' \
+    -u 'root:effeff_secret' \
     --data-binary @/docker/schema.surql"
 
 # 3. Open http://localhost:5173

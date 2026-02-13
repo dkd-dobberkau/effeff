@@ -9,7 +9,7 @@ RSpec.describe SurrealClient do
     allow(ENV).to receive(:fetch).with("SURREAL_HTTP_URL", anything).and_return(base_url)
     allow(ENV).to receive(:fetch).with("SURREAL_USER", anything).and_return("root")
     allow(ENV).to receive(:fetch).with("SURREAL_PASS", anything).and_return("secret")
-    allow(ENV).to receive(:fetch).with("SURREAL_NS", anything).and_return("formflow")
+    allow(ENV).to receive(:fetch).with("SURREAL_NS", anything).and_return("effeff")
     allow(ENV).to receive(:fetch).with("SURREAL_DB", anything).and_return("main")
   end
 
@@ -21,7 +21,7 @@ RSpec.describe SurrealClient do
           headers: {
             "Content-Type" => "application/json",
             "Accept" => "application/json",
-            "surreal-ns" => "formflow",
+            "surreal-ns" => "effeff",
             "surreal-db" => "main"
           },
           basic_auth: ["root", "secret"]
